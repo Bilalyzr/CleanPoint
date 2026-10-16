@@ -5,5 +5,5 @@ package web
 
 import "embed"
 
-//go:embed index.html landing.html styles.css app.js
+//go:embed index.html landing.html landing.css landing.js styles.css app.js
 var FS embed.FS

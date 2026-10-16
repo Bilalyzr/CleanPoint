@@ -78,6 +78,7 @@ func (s *Server) routes() {
 	m.HandleFunc("GET /{$}", s.landingPage())
 	m.Handle("GET /app", http.RedirectHandler("/app/", http.StatusMovedPermanently))
 	m.Handle("GET /app/{path...}", s.webUI())
+	m.Handle("GET /landing/{path...}", s.webUI())
 
 	// Fallback: unknown paths return structured 404 rather than plain text.
 	m.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

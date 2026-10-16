@@ -26,7 +26,8 @@ func (s *Server) landingPage() http.HandlerFunc {
 // landing.html, which the file server refuses to expose: only app assets are
 // whitelisted.
 func (s *Server) webUI() http.Handler {
-	allowed := map[string]bool{"app.js": true, "styles.css": true, "index.html": true}
+	allowed := map[string]bool{"app.js": true, "styles.css": true, "index.html": true,
+		"landing.css": true, "landing.js": true}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		name := r.PathValue("path")
 		if !allowed[name] {
