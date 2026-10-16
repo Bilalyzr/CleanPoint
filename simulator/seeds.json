@@ -1,0 +1,6 @@
+{
+  "comment": "Evaluation seed split by (family, seed) grouping per PRD 15.3: 60% development, 20% validation, 20% locked final. Splits never interleave windows from one incident.",
+  "development": [1, 2, 3, 4, 5, 6],
+  "validation": [7, 8],
+  "locked": [9, 10]
+}

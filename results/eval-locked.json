@@ -1,0 +1,817 @@
+{
+  "metrics": {
+    "scenarios": 16,
+    "scenarios_with_selection": 14,
+    "unsafe_selections": 0,
+    "unsafe_selection_rate": 0.0,
+    "selection_success_num": 8,
+    "selection_success_den": 8,
+    "selection_success_rate": 1.0,
+    "benign_windows": 240,
+    "benign_flagged_windows": 2,
+    "benign_alert_rate": 0.0083,
+    "attack_scenarios": 8,
+    "attack_detected": 8,
+    "known_attack_recall": 1.0,
+    "detection_delay_minutes": [
+      2.23,
+      4.08,
+      4.43,
+      2.37,
+      3.45,
+      3.32,
+      2.12,
+      4.8
+    ],
+    "pre_existing_abstained": 2,
+    "pre_existing_total": 2,
+    "pre_existing_abstention_correct": 2,
+    "baseline_selector_unsafe": {
+      "newest": 10,
+      "integrity_only": 10
+    },
+    "baseline_selector_den": 16,
+    "restores_performed": 14,
+    "restores_verified": 14,
+    "restore_integrity_ok": true,
+    "all_restores_source_unchanged": true,
+    "methodology": {
+      "splits": {
+        "comment": "Evaluation seed split by (family, seed) grouping per PRD 15.3: 60% development, 20% validation, 20% locked final. Splits never interleave windows from one incident.",
+        "development": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "validation": [
+          7,
+          8
+        ],
+        "locked": [
+          9,
+          10
+        ]
+      },
+      "families": [
+        "normal_office",
+        "benign_archive",
+        "benign_bulk_update",
+        "rapid_destructive",
+        "slow_distributed",
+        "extension_churn",
+        "mixed_activity",
+        "pre_existing_contamination"
+      ],
+      "seeds_used": [
+        9,
+        10
+      ],
+      "note": "Synthetic scenarios only. Metrics are measured on this corpus, not production statistics. Baseline selectors and CleanPoint are reported separately and never merged into one accuracy figure."
+    }
+  },
+  "results": [
+    {
+      "workload_id": "wl-8bd009e22625",
+      "scenario": "normal_office",
+      "seed": 9,
+      "benign": true,
+      "attack_start": null,
+      "onset": null,
+      "windows_evaluated": 16,
+      "suspicious_windows": 0,
+      "total_windows": 40,
+      "selector_status": "candidate_available",
+      "recommended_snapshot_id": "snap-9c520784c7aa",
+      "snapshot_truth": {
+        "snap-429109d19d8c": false,
+        "snap-825e0af2b7c7": false,
+        "snap-ae7d44eada10": false,
+        "snap-55b8a213552a": false,
+        "snap-17fa8a007e71": false,
+        "snap-990d6ebd9fdd": false,
+        "snap-bfee1e97fa67": false,
+        "snap-5478c650b706": false,
+        "snap-94ecc32712e3": false,
+        "snap-117556395706": false,
+        "snap-7b17af7a3a13": false,
+        "snap-bde81d3ccd1d": false,
+        "snap-9c520784c7aa": false
+      },
+      "recommended_contaminated": false,
+      "selection_is_newest_clean": true,
+      "abstention_correct": null,
+      "baseline_newest": {
+        "snapshot_id": "snap-9c520784c7aa",
+        "contaminated": false
+      },
+      "baseline_integrity_newest": {
+        "snapshot_id": "snap-9c520784c7aa",
+        "contaminated": false
+      },
+      "restore": {
+        "status": "verified",
+        "http": 201,
+        "verified_files": 129,
+        "failed_files": 0,
+        "source_unchanged": true,
+        "output_dir": "C:/Users/moham/Downloads/CleanPoint/sandbox/restored/normal-office-seed9-4abcfc6cb43b"
+      }
+    },
+    {
+      "workload_id": "wl-5d5d3a1df271",
+      "scenario": "normal_office",
+      "seed": 10,
+      "benign": true,
+      "attack_start": null,
+      "onset": null,
+      "windows_evaluated": 16,
+      "suspicious_windows": 0,
+      "total_windows": 40,
+      "selector_status": "candidate_available",
+      "recommended_snapshot_id": "snap-bfe456481b09",
+      "snapshot_truth": {
+        "snap-822bb518eae1": false,
+        "snap-017ea2aef256": false,
+        "snap-d71c2581d2d3": false,
+        "snap-42bddf2dbccc": false,
+        "snap-3cd6013bd733": false,
+        "snap-6ce9b4b281bf": false,
+        "snap-49d5bfa0e2c0": false,
+        "snap-83f9bb488bbe": false,
+        "snap-793e7b2258b6": false,
+        "snap-814825293b4e": false,
+        "snap-2f8d1cc3b3e1": false,
+        "snap-6addb3d60b16": false,
+        "snap-bfe456481b09": false
+      },
+      "recommended_contaminated": false,
+      "selection_is_newest_clean": true,
+      "abstention_correct": null,
+      "baseline_newest": {
+        "snapshot_id": "snap-bfe456481b09",
+        "contaminated": false
+      },
+      "baseline_integrity_newest": {
+        "snapshot_id": "snap-bfe456481b09",
+        "contaminated": false
+      },
+      "restore": {
+        "status": "verified",
+        "http": 201,
+        "verified_files": 122,
+        "failed_files": 0,
+        "source_unchanged": true,
+        "output_dir": "C:/Users/moham/Downloads/CleanPoint/sandbox/restored/normal-office-seed10-ee25277b96e1"
+      }
+    },
+    {
+      "workload_id": "wl-de633d2a414c",
+      "scenario": "benign_archive",
+      "seed": 9,
+      "benign": true,
+      "attack_start": null,
+      "onset": "2026-01-05T11:20:00.000Z",
+      "windows_evaluated": 16,
+      "suspicious_windows": 1,
+      "total_windows": 40,
+      "selector_status": "candidate_available",
+      "recommended_snapshot_id": "snap-e401a17cea09",
+      "snapshot_truth": {
+        "snap-1bb1cc4ffbff": false,
+        "snap-94fd845ad3a9": false,
+        "snap-22ab4023324e": false,
+        "snap-6bd367caa40f": false,
+        "snap-a09711619815": false,
+        "snap-d0d7f7cbfcec": false,
+        "snap-cc5663784510": false,
+        "snap-e401a17cea09": false,
+        "snap-63c44a7751e5": false,
+        "snap-b8485c88dc91": false,
+        "snap-59f017459d8f": false,
+        "snap-2ed442afe68d": false,
+        "snap-4ef273ddc7ca": false
+      },
+      "recommended_contaminated": false,
+      "selection_is_newest_clean": false,
+      "abstention_correct": null,
+      "baseline_newest": {
+        "snapshot_id": "snap-4ef273ddc7ca",
+        "contaminated": false
+      },
+      "baseline_integrity_newest": {
+        "snapshot_id": "snap-4ef273ddc7ca",
+        "contaminated": false
+      },
+      "restore": {
+        "status": "verified",
+        "http": 201,
+        "verified_files": 120,
+        "failed_files": 0,
+        "source_unchanged": true,
+        "output_dir": "C:/Users/moham/Downloads/CleanPoint/sandbox/restored/benign-archive-seed9-45b5345d7cb2"
+      }
+    },
+    {
+      "workload_id": "wl-e206aa3792e8",
+      "scenario": "benign_archive",
+      "seed": 10,
+      "benign": true,
+      "attack_start": null,
+      "onset": "2026-01-05T11:20:00.000Z",
+      "windows_evaluated": 16,
+      "suspicious_windows": 1,
+      "total_windows": 40,
+      "selector_status": "candidate_available",
+      "recommended_snapshot_id": "snap-5af5b3a3727e",
+      "snapshot_truth": {
+        "snap-be0009308c74": false,
+        "snap-9cc3c200b2a7": false,
+        "snap-77588f57a932": false,
+        "snap-bcb7c6a650ed": false,
+        "snap-11058c506a8c": false,
+        "snap-8ba77124c8fb": false,
+        "snap-0768f330f201": false,
+        "snap-5af5b3a3727e": false,
+        "snap-f3a1e2d8e9bc": false,
+        "snap-847379ee8ac8": false,
+        "snap-5d83aa055d6d": false,
+        "snap-84ed478587dd": false,
+        "snap-e893c69d00aa": false
+      },
+      "recommended_contaminated": false,
+      "selection_is_newest_clean": false,
+      "abstention_correct": null,
+      "baseline_newest": {
+        "snapshot_id": "snap-e893c69d00aa",
+        "contaminated": false
+      },
+      "baseline_integrity_newest": {
+        "snapshot_id": "snap-e893c69d00aa",
+        "contaminated": false
+      },
+      "restore": {
+        "status": "verified",
+        "http": 201,
+        "verified_files": 118,
+        "failed_files": 0,
+        "source_unchanged": true,
+        "output_dir": "C:/Users/moham/Downloads/CleanPoint/sandbox/restored/benign-archive-seed10-ceb437fb97ce"
+      }
+    },
+    {
+      "workload_id": "wl-0e76c0de12a3",
+      "scenario": "benign_bulk_update",
+      "seed": 9,
+      "benign": true,
+      "attack_start": null,
+      "onset": null,
+      "windows_evaluated": 16,
+      "suspicious_windows": 0,
+      "total_windows": 40,
+      "selector_status": "candidate_available",
+      "recommended_snapshot_id": "snap-cbeaa2063b63",
+      "snapshot_truth": {
+        "snap-333a3e11dbb9": false,
+        "snap-69c6f241b6dc": false,
+        "snap-0e36ab7c7ca7": false,
+        "snap-1ae00fcd3b8e": false,
+        "snap-f0eaf2afa8c3": false,
+        "snap-90e2601e4cfe": false,
+        "snap-9bd08695045c": false,
+        "snap-08ca1ddf48c3": false,
+        "snap-4a79bead041d": false,
+        "snap-5608693da428": false,
+        "snap-167abb0e4e67": false,
+        "snap-40ab7ec67eda": false,
+        "snap-cbeaa2063b63": false
+      },
+      "recommended_contaminated": false,
+      "selection_is_newest_clean": true,
+      "abstention_correct": null,
+      "baseline_newest": {
+        "snapshot_id": "snap-cbeaa2063b63",
+        "contaminated": false
+      },
+      "baseline_integrity_newest": {
+        "snapshot_id": "snap-cbeaa2063b63",
+        "contaminated": false
+      },
+      "restore": {
+        "status": "verified",
+        "http": 201,
+        "verified_files": 118,
+        "failed_files": 0,
+        "source_unchanged": true,
+        "output_dir": "C:/Users/moham/Downloads/CleanPoint/sandbox/restored/benign-bulk-update-seed9-a1180a9fc52c"
+      }
+    },
+    {
+      "workload_id": "wl-1b292cad1630",
+      "scenario": "benign_bulk_update",
+      "seed": 10,
+      "benign": true,
+      "attack_start": null,
+      "onset": null,
+      "windows_evaluated": 16,
+      "suspicious_windows": 0,
+      "total_windows": 40,
+      "selector_status": "candidate_available",
+      "recommended_snapshot_id": "snap-4980818e9c95",
+      "snapshot_truth": {
+        "snap-fa79c134d779": false,
+        "snap-f5fc49d4098e": false,
+        "snap-891801949d9b": false,
+        "snap-97ed6753d56a": false,
+        "snap-110789afa5aa": false,
+        "snap-4a04415f1e2d": false,
+        "snap-0719ec2bfe28": false,
+        "snap-d813bb080adf": false,
+        "snap-ff41a8d33501": false,
+        "snap-2d2312f09c9f": false,
+        "snap-40f54afd9843": false,
+        "snap-bb8b67ca5693": false,
+        "snap-4980818e9c95": false
+      },
+      "recommended_contaminated": false,
+      "selection_is_newest_clean": true,
+      "abstention_correct": null,
+      "baseline_newest": {
+        "snapshot_id": "snap-4980818e9c95",
+        "contaminated": false
+      },
+      "baseline_integrity_newest": {
+        "snapshot_id": "snap-4980818e9c95",
+        "contaminated": false
+      },
+      "restore": {
+        "status": "verified",
+        "http": 201,
+        "verified_files": 123,
+        "failed_files": 0,
+        "source_unchanged": true,
+        "output_dir": "C:/Users/moham/Downloads/CleanPoint/sandbox/restored/benign-bulk-update-seed10-608bdf2faf09"
+      }
+    },
+    {
+      "workload_id": "wl-37407c1e9bb5",
+      "scenario": "rapid_destructive",
+      "seed": 9,
+      "benign": false,
+      "attack_start": "2026-01-05T11:17:14.000Z",
+      "onset": "2026-01-05T11:15:00.000Z",
+      "windows_evaluated": 16,
+      "suspicious_windows": 2,
+      "total_windows": 40,
+      "selector_status": "candidate_available",
+      "recommended_snapshot_id": "snap-57851facc64c",
+      "snapshot_truth": {
+        "snap-c0496ce28e73": false,
+        "snap-6455e6ad98d4": false,
+        "snap-f6eef2379df6": false,
+        "snap-d28985aa91a4": false,
+        "snap-4064b213cf48": false,
+        "snap-3089065d103c": false,
+        "snap-6a63cbab85e0": false,
+        "snap-57851facc64c": false,
+        "snap-31fa4b814657": true,
+        "snap-80bbfa5c01de": true,
+        "snap-08d42c5f7492": true,
+        "snap-f09dd9cfa4f3": true,
+        "snap-a7b3c2a780e7": true
+      },
+      "recommended_contaminated": false,
+      "selection_is_newest_clean": true,
+      "abstention_correct": null,
+      "baseline_newest": {
+        "snapshot_id": "snap-a7b3c2a780e7",
+        "contaminated": true
+      },
+      "baseline_integrity_newest": {
+        "snapshot_id": "snap-a7b3c2a780e7",
+        "contaminated": true
+      },
+      "restore": {
+        "status": "verified",
+        "http": 201,
+        "verified_files": 120,
+        "failed_files": 0,
+        "source_unchanged": true,
+        "output_dir": "C:/Users/moham/Downloads/CleanPoint/sandbox/restored/rapid-destructive-seed9-0fee451e2e92"
+      }
+    },
+    {
+      "workload_id": "wl-14f749ff7c33",
+      "scenario": "rapid_destructive",
+      "seed": 10,
+      "benign": false,
+      "attack_start": "2026-01-05T11:19:05.000Z",
+      "onset": "2026-01-05T11:15:00.000Z",
+      "windows_evaluated": 16,
+      "suspicious_windows": 2,
+      "total_windows": 40,
+      "selector_status": "candidate_available",
+      "recommended_snapshot_id": "snap-e16b68f9f537",
+      "snapshot_truth": {
+        "snap-43a20bb51bd4": false,
+        "snap-d50cdac58db4": false,
+        "snap-75799198bf39": false,
+        "snap-a137d8301035": false,
+        "snap-f6e8b6a4fe0a": false,
+        "snap-ffa296595203": false,
+        "snap-80a795946f4a": false,
+        "snap-e16b68f9f537": false,
+        "snap-b28a540ab850": true,
+        "snap-42f704dd26f3": true,
+        "snap-772ca2a6181e": true,
+        "snap-8ce08e3611e1": true,
+        "snap-864b72d9200a": true
+      },
+      "recommended_contaminated": false,
+      "selection_is_newest_clean": true,
+      "abstention_correct": null,
+      "baseline_newest": {
+        "snapshot_id": "snap-864b72d9200a",
+        "contaminated": true
+      },
+      "baseline_integrity_newest": {
+        "snapshot_id": "snap-864b72d9200a",
+        "contaminated": true
+      },
+      "restore": {
+        "status": "verified",
+        "http": 201,
+        "verified_files": 119,
+        "failed_files": 0,
+        "source_unchanged": true,
+        "output_dir": "C:/Users/moham/Downloads/CleanPoint/sandbox/restored/rapid-destructive-seed10-1b8c15335b4f"
+      }
+    },
+    {
+      "workload_id": "wl-6aee1605ce3d",
+      "scenario": "slow_distributed",
+      "seed": 9,
+      "benign": false,
+      "attack_start": "2026-01-05T11:14:26.000Z",
+      "onset": "2026-01-05T11:10:00.000Z",
+      "windows_evaluated": 16,
+      "suspicious_windows": 13,
+      "total_windows": 40,
+      "selector_status": "candidate_available",
+      "recommended_snapshot_id": "snap-59b81f7a8140",
+      "snapshot_truth": {
+        "snap-c2172ec43eb7": false,
+        "snap-486084ce2996": false,
+        "snap-7c93866a40eb": false,
+        "snap-9723edbe2763": false,
+        "snap-cf6657dd668e": false,
+        "snap-e0400a73383e": false,
+        "snap-1a6d4ee333a6": false,
+        "snap-59b81f7a8140": false,
+        "snap-8137d1d289d5": true,
+        "snap-ae3c8f2e495b": true,
+        "snap-8d89409c79f6": true,
+        "snap-a4959ae8cd6f": true,
+        "snap-e09c088af734": true
+      },
+      "recommended_contaminated": false,
+      "selection_is_newest_clean": true,
+      "abstention_correct": null,
+      "baseline_newest": {
+        "snapshot_id": "snap-e09c088af734",
+        "contaminated": true
+      },
+      "baseline_integrity_newest": {
+        "snapshot_id": "snap-e09c088af734",
+        "contaminated": true
+      },
+      "restore": {
+        "status": "verified",
+        "http": 201,
+        "verified_files": 123,
+        "failed_files": 0,
+        "source_unchanged": true,
+        "output_dir": "C:/Users/moham/Downloads/CleanPoint/sandbox/restored/slow-distributed-seed9-1b6a917d7248"
+      }
+    },
+    {
+      "workload_id": "wl-34b387205d70",
+      "scenario": "slow_distributed",
+      "seed": 10,
+      "benign": false,
+      "attack_start": "2026-01-05T11:12:22.000Z",
+      "onset": "2026-01-05T11:10:00.000Z",
+      "windows_evaluated": 16,
+      "suspicious_windows": 13,
+      "total_windows": 40,
+      "selector_status": "candidate_available",
+      "recommended_snapshot_id": "snap-4a1cfbda65fa",
+      "snapshot_truth": {
+        "snap-c1904fb3f291": false,
+        "snap-ea96e66b73ba": false,
+        "snap-ac48444e7f76": false,
+        "snap-06024c0ca7cb": false,
+        "snap-60f5795bbb0c": false,
+        "snap-4be1a9cdd48a": false,
+        "snap-c29031d56584": false,
+        "snap-4a1cfbda65fa": false,
+        "snap-d9ffce3215ef": true,
+        "snap-8618d43b35e6": true,
+        "snap-45e577f9e62c": true,
+        "snap-b628636b439d": true,
+        "snap-09f3efd9caad": true
+      },
+      "recommended_contaminated": false,
+      "selection_is_newest_clean": true,
+      "abstention_correct": null,
+      "baseline_newest": {
+        "snapshot_id": "snap-09f3efd9caad",
+        "contaminated": true
+      },
+      "baseline_integrity_newest": {
+        "snapshot_id": "snap-09f3efd9caad",
+        "contaminated": true
+      },
+      "restore": {
+        "status": "verified",
+        "http": 201,
+        "verified_files": 121,
+        "failed_files": 0,
+        "source_unchanged": true,
+        "output_dir": "C:/Users/moham/Downloads/CleanPoint/sandbox/restored/slow-distributed-seed10-0b87fa5485ca"
+      }
+    },
+    {
+      "workload_id": "wl-fdc0f705e172",
+      "scenario": "extension_churn",
+      "seed": 9,
+      "benign": false,
+      "attack_start": "2026-01-05T11:18:27.000Z",
+      "onset": "2026-01-05T11:15:00.000Z",
+      "windows_evaluated": 16,
+      "suspicious_windows": 8,
+      "total_windows": 40,
+      "selector_status": "candidate_available",
+      "recommended_snapshot_id": "snap-20a596b6984a",
+      "snapshot_truth": {
+        "snap-cd9c6ed6dfd7": false,
+        "snap-41363a1dae27": false,
+        "snap-dd4c5d15e427": false,
+        "snap-37401b22f203": false,
+        "snap-c59c4d0e80ec": false,
+        "snap-fdb3380d4c22": false,
+        "snap-5a0d8e39ee62": false,
+        "snap-20a596b6984a": false,
+        "snap-daa4a3bcd1a1": true,
+        "snap-473fce38241a": true,
+        "snap-47c2eaf15fbc": true,
+        "snap-158c0dd139a6": true,
+        "snap-81c607dcdf39": true
+      },
+      "recommended_contaminated": false,
+      "selection_is_newest_clean": true,
+      "abstention_correct": null,
+      "baseline_newest": {
+        "snapshot_id": "snap-81c607dcdf39",
+        "contaminated": true
+      },
+      "baseline_integrity_newest": {
+        "snapshot_id": "snap-81c607dcdf39",
+        "contaminated": true
+      },
+      "restore": {
+        "status": "verified",
+        "http": 201,
+        "verified_files": 123,
+        "failed_files": 0,
+        "source_unchanged": true,
+        "output_dir": "C:/Users/moham/Downloads/CleanPoint/sandbox/restored/extension-churn-seed9-8df71de47d98"
+      }
+    },
+    {
+      "workload_id": "wl-59a03e5a1d6d",
+      "scenario": "extension_churn",
+      "seed": 10,
+      "benign": false,
+      "attack_start": "2026-01-05T11:18:19.000Z",
+      "onset": "2026-01-05T11:15:00.000Z",
+      "windows_evaluated": 16,
+      "suspicious_windows": 8,
+      "total_windows": 40,
+      "selector_status": "candidate_available",
+      "recommended_snapshot_id": "snap-e68c53cab23d",
+      "snapshot_truth": {
+        "snap-40932c3bd614": false,
+        "snap-512bd251119b": false,
+        "snap-26d410440c8b": false,
+        "snap-ade37a0c7620": false,
+        "snap-6ffebd064272": false,
+        "snap-29ef1cad53f7": false,
+        "snap-93106be6ef54": false,
+        "snap-e68c53cab23d": false,
+        "snap-e7de40d99120": true,
+        "snap-823f1c202ed4": true,
+        "snap-c1d67c8d95a2": true,
+        "snap-7f0d2e520a3d": true,
+        "snap-208ce933c214": true
+      },
+      "recommended_contaminated": false,
+      "selection_is_newest_clean": true,
+      "abstention_correct": null,
+      "baseline_newest": {
+        "snapshot_id": "snap-208ce933c214",
+        "contaminated": true
+      },
+      "baseline_integrity_newest": {
+        "snapshot_id": "snap-208ce933c214",
+        "contaminated": true
+      },
+      "restore": {
+        "status": "verified",
+        "http": 201,
+        "verified_files": 117,
+        "failed_files": 0,
+        "source_unchanged": true,
+        "output_dir": "C:/Users/moham/Downloads/CleanPoint/sandbox/restored/extension-churn-seed10-a75ebf70922d"
+      }
+    },
+    {
+      "workload_id": "wl-981588fe1c1a",
+      "scenario": "mixed_activity",
+      "seed": 9,
+      "benign": false,
+      "attack_start": "2026-01-05T11:32:07.000Z",
+      "onset": "2026-01-05T11:30:00.000Z",
+      "windows_evaluated": 16,
+      "suspicious_windows": 2,
+      "total_windows": 40,
+      "selector_status": "candidate_available",
+      "recommended_snapshot_id": "snap-280d0c2b7b11",
+      "snapshot_truth": {
+        "snap-c9b87f30bfbb": false,
+        "snap-73be97b246e0": false,
+        "snap-09d1e63f189d": false,
+        "snap-09e25130e032": false,
+        "snap-80462e4e2f7a": false,
+        "snap-c6be525d8408": false,
+        "snap-876a5e437b0c": false,
+        "snap-d77ba1d3cffc": false,
+        "snap-280d0c2b7b11": false,
+        "snap-c56d9bb3673c": true,
+        "snap-ebc548ec1b11": true,
+        "snap-81962b35225d": true,
+        "snap-647f6eccf533": true
+      },
+      "recommended_contaminated": false,
+      "selection_is_newest_clean": true,
+      "abstention_correct": null,
+      "baseline_newest": {
+        "snapshot_id": "snap-647f6eccf533",
+        "contaminated": true
+      },
+      "baseline_integrity_newest": {
+        "snapshot_id": "snap-647f6eccf533",
+        "contaminated": true
+      },
+      "restore": {
+        "status": "verified",
+        "http": 201,
+        "verified_files": 115,
+        "failed_files": 0,
+        "source_unchanged": true,
+        "output_dir": "C:/Users/moham/Downloads/CleanPoint/sandbox/restored/mixed-activity-seed9-70d0a0d1eb4a"
+      }
+    },
+    {
+      "workload_id": "wl-5739b54fc9a4",
+      "scenario": "mixed_activity",
+      "seed": 10,
+      "benign": false,
+      "attack_start": "2026-01-05T11:34:48.000Z",
+      "onset": "2026-01-05T11:30:00.000Z",
+      "windows_evaluated": 16,
+      "suspicious_windows": 2,
+      "total_windows": 40,
+      "selector_status": "candidate_available",
+      "recommended_snapshot_id": "snap-47767b8c0f90",
+      "snapshot_truth": {
+        "snap-6929986e8d7e": false,
+        "snap-9586bade17eb": false,
+        "snap-297c78440e92": false,
+        "snap-6267a106a426": false,
+        "snap-1a14b9aca6b1": false,
+        "snap-3acb9d6211f9": false,
+        "snap-a260e2f4f1c7": false,
+        "snap-33b5900f5641": false,
+        "snap-47767b8c0f90": false,
+        "snap-b0df1fed0847": true,
+        "snap-eeab7a6fd67b": true,
+        "snap-5265fc4a9690": true,
+        "snap-574598fea0b2": true
+      },
+      "recommended_contaminated": false,
+      "selection_is_newest_clean": true,
+      "abstention_correct": null,
+      "baseline_newest": {
+        "snapshot_id": "snap-574598fea0b2",
+        "contaminated": true
+      },
+      "baseline_integrity_newest": {
+        "snapshot_id": "snap-574598fea0b2",
+        "contaminated": true
+      },
+      "restore": {
+        "status": "verified",
+        "http": 201,
+        "verified_files": 120,
+        "failed_files": 0,
+        "source_unchanged": true,
+        "output_dir": "C:/Users/moham/Downloads/CleanPoint/sandbox/restored/mixed-activity-seed10-d0c704c99459"
+      }
+    },
+    {
+      "workload_id": "wl-5ab977a98cd4",
+      "scenario": "pre_existing_contamination",
+      "seed": 9,
+      "benign": false,
+      "attack_start": "2026-01-05T09:06:39.000Z",
+      "onset": null,
+      "windows_evaluated": 16,
+      "suspicious_windows": 0,
+      "total_windows": 40,
+      "selector_status": "no_safe_candidate",
+      "recommended_snapshot_id": null,
+      "snapshot_truth": {
+        "snap-3b9d0f1eb8fb": true,
+        "snap-fe5bb9cf0eb9": true,
+        "snap-d499b79b107c": true,
+        "snap-a27d00dcea85": true,
+        "snap-3592289459d9": true,
+        "snap-947bec65971f": true,
+        "snap-39360bfc136f": true,
+        "snap-0a78f858fdd8": true,
+        "snap-1de13657f67f": true,
+        "snap-d4b394798eed": true,
+        "snap-2c14657fb8fa": true,
+        "snap-f1c48f7ee917": true,
+        "snap-2628da4c523f": true
+      },
+      "recommended_contaminated": null,
+      "selection_is_newest_clean": null,
+      "abstained": true,
+      "abstention_correct": true,
+      "baseline_newest": {
+        "snapshot_id": "snap-2628da4c523f",
+        "contaminated": true
+      },
+      "baseline_integrity_newest": {
+        "snapshot_id": "snap-2628da4c523f",
+        "contaminated": true
+      },
+      "restore": null
+    },
+    {
+      "workload_id": "wl-2680c06da604",
+      "scenario": "pre_existing_contamination",
+      "seed": 10,
+      "benign": false,
+      "attack_start": "2026-01-05T09:06:41.000Z",
+      "onset": null,
+      "windows_evaluated": 16,
+      "suspicious_windows": 0,
+      "total_windows": 40,
+      "selector_status": "no_safe_candidate",
+      "recommended_snapshot_id": null,
+      "snapshot_truth": {
+        "snap-d6dc85f28beb": true,
+        "snap-7acd75413e5d": true,
+        "snap-9ec109b1f6e2": true,
+        "snap-9c9fe2181a03": true,
+        "snap-c00987043e15": true,
+        "snap-78161539ac19": true,
+        "snap-08fb67c870fa": true,
+        "snap-b2eb133202a8": true,
+        "snap-e89d65d6cee6": true,
+        "snap-83b42b80e660": true,
+        "snap-a057d455b0c6": true,
+        "snap-74426d174bd6": true,
+        "snap-c2bd37765088": true
+      },
+      "recommended_contaminated": null,
+      "selection_is_newest_clean": null,
+      "abstained": true,
+      "abstention_correct": true,
+      "baseline_newest": {
+        "snapshot_id": "snap-c2bd37765088",
+        "contaminated": true
+      },
+      "baseline_integrity_newest": {
+        "snapshot_id": "snap-c2bd37765088",
+        "contaminated": true
+      },
+      "restore": null
+    }
+  ]
+}

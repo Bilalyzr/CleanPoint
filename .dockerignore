@@ -1,0 +1,7 @@
+bin/
+sandbox/
+.scratch/
+results/
+__pycache__/
+*.pyc
+.git/

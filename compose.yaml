@@ -1,0 +1,20 @@
+# Optional Compose wrapper around the SAME single local process (M0 topology).
+# The published port is bound to loopback on the host by design.
+services:
+  cleanpoint:
+    build: .
+    image: cleanpoint:local
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      CLEANPOINT_ADDR: 0.0.0.0:8080
+      CLEANPOINT_SANDBOX_ROOT: /app/sandbox
+      # set explicit tokens in production-of-the-demo:
+      # CLEANPOINT_OPERATOR_TOKEN: change-me
+      # CLEANPOINT_READONLY_TOKEN: change-me-too
+    volumes:
+      - cleanpoint-data:/app/sandbox
+    restart: unless-stopped
+
+volumes:
+  cleanpoint-data:

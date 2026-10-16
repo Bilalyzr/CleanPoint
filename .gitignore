@@ -1,0 +1,12 @@
+# build artifacts
+bin/
+# local runtime state (database, object store, restores, tokens)
+sandbox/
+# evaluation / benchmark outputs are kept in results/ EXCEPT scratch
+results/*.local.*
+.scratch/
+__pycache__/
+*.pyc
+# OS noise
+Thumbs.db
+.DS_Store

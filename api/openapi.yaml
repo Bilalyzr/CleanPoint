@@ -1,0 +1,373 @@
+openapi: 3.0.3
+info:
+  title: CleanPoint API
+  version: 1.0.0
+  description: |
+    Local ransomware-recovery analysis simulator (defensive prototype).
+    Base path `/api/v1`. State-changing endpoints require the operator
+    bearer token; read endpoints accept read-only or operator tokens;
+    `/healthz` is open (loopback only); `/metrics` requires any valid token.
+    This is a local simulation — not a production data-protection product.
+servers:
+  - url: http://127.0.0.1:8080
+security:
+  - bearerAuth: []
+
+paths:
+  /healthz:
+    get:
+      summary: Health status
+      security: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Health" }
+  /metrics:
+    get:
+      summary: Restricted Prometheus metrics (any valid token)
+      responses:
+        "200": { description: Prometheus text exposition }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /workloads:
+    post:
+      summary: Register sandbox workload (operator)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WorkloadCreate" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Workload" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/UnsafePath" }
+    get:
+      summary: List workloads
+      responses:
+        "200":
+          description: Workload list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  workloads:
+                    type: array
+                    items: { $ref: "#/components/schemas/Workload" }
+                  count: { type: integer }
+  /workloads/{id}/events:
+    post:
+      summary: Ingest safe synthetic events (operator; idempotent by event id)
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EventBatch" }
+      responses:
+        "200":
+          description: Ingestion outcome
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/IngestResult" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "413": { $ref: "#/components/responses/Limit" }
+        "422": { $ref: "#/components/responses/UnsafePath" }
+    get:
+      summary: List ingested events (read)
+      parameters:
+        - { $ref: "#/components/parameters/Id" }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 1000, maximum: 5000 }
+      responses:
+        "200": { description: Event list }
+  /workloads/{id}/snapshots:
+    post:
+      summary: Capture and seal a snapshot (operator)
+      description: |
+        Walks the workload root, writes content-addressed objects, seals a
+        canonical manifest. `captured_at` defaults to the latest ingested
+        event time (the simulation clock).
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                captured_at: { type: string, format: date-time }
+      responses:
+        "201":
+          description: Sealed snapshot
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Snapshot" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "413": { $ref: "#/components/responses/Limit" }
+        "422": { $ref: "#/components/responses/UnsafePath" }
+    get:
+      summary: List snapshots with current assessments (read)
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200": { description: Snapshot list (newest first) }
+  /workloads/{id}/analyze:
+    post:
+      summary: Run detector and assessments (operator)
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AnalyzeRequest" }
+      responses:
+        "200": { description: Findings (windows, onset, affected files) }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /workloads/{id}/findings:
+    get:
+      summary: Latest analysis findings (read)
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200": { description: Findings }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /workloads/{id}/recovery-candidates:
+    get:
+      summary: Rank candidates or abstain (read)
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200":
+          description: Selector report
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SelectorReport" }
+  /workloads/{id}/restore:
+    post:
+      summary: Operator-confirmed sandbox restore
+      description: |
+        Re-verifies eligibility and object hashes at restore time. Output is
+        always a server-generated directory under the sandbox restore root.
+        `confirm` must be true and an operator token is required.
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [snapshot_id, target_name, confirm]
+              properties:
+                snapshot_id: { type: string }
+                target_name: { type: string, pattern: "^[a-z0-9][a-z0-9-]{0,63}$" }
+                confirm: { type: boolean, enum: [true] }
+      responses:
+        "201": { description: Verified (or failed) restore report }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "409": { $ref: "#/components/responses/Conflict" }
+  /recovery-runs/{id}:
+    get:
+      summary: Recovery run report (read)
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200": { description: Run report }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /workloads/{id}/recovery-runs:
+    get:
+      summary: List recovery runs for a workload (read)
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200": { description: Run list }
+  /audit-events:
+    get:
+      summary: Audit trail (operator only)
+      responses:
+        "200": { description: Audit events (newest first, capped) }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /config:
+    get:
+      summary: Runtime configuration and documented limits (read)
+      responses:
+        "200": { description: Config + limitations }
+
+components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema: { type: string }
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid bearer token
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Forbidden:
+      description: Valid token but insufficient role
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    NotFound:
+      description: Unknown resource
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Conflict:
+      description: Conflicting operation (duplicate id, busy, stale eligibility)
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    BadRequest:
+      description: Invalid JSON or input
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Limit:
+      description: Resource limit exceeded
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    UnsafePath:
+      description: Semantically unsafe path
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+  schemas:
+    Error:
+      type: object
+      required: [code, message, request_id]
+      properties:
+        code:
+          type: string
+          enum: [unauthenticated, forbidden, not_found, conflict, busy,
+                 confirm_required, limit_exceeded, unsafe_path, root_unavailable,
+                 no_telemetry, invalid_input, internal, not_eligible]
+        message: { type: string }
+        details: { type: array, items: { type: string } }
+        request_id: { type: string }
+
+    Health:
+      type: object
+      properties:
+        status: { type: string, example: ok }
+        time: { type: string, format: date-time }
+        mode: { type: string, example: local-simulation }
+
+    WorkloadCreate:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, pattern: "^[a-z0-9][a-z0-9-]{0,63}$" }
+        root_path:
+          type: string
+          description: optional; must resolve inside the sandbox roots allowlist
+
+    Workload:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        root_path: { type: string }
+        created_at: { type: string, format: date-time }
+
+    EventBatch:
+      type: object
+      required: [events]
+      properties:
+        events:
+          type: array
+          minItems: 1
+          items: { $ref: "#/components/schemas/FileEvent" }
+
+    FileEvent:
+      type: object
+      required: [id, timestamp, operation, path]
+      properties:
+        id: { type: string, maxLength: 128 }
+        timestamp: { type: string, format: date-time }
+        operation: { type: string, enum: [create, modify, delete, rename] }
+        path: { type: string }
+        dest_path: { type: string }
+        old_sha256: { type: string, pattern: "^[0-9a-fA-F]{64}$" }
+        new_sha256: { type: string, pattern: "^[0-9a-fA-F]{64}$" }
+        old_entropy: { type: number, minimum: 0, maximum: 8 }
+        new_entropy: { type: number, minimum: 0, maximum: 8 }
+        old_size: { type: integer, minimum: 0 }
+        new_size: { type: integer, minimum: 0 }
+        actor: { type: string }
+        scenario_id: { type: string, maxLength: 64 }
+
+    IngestResult:
+      type: object
+      properties:
+        workload_id: { type: string }
+        ingested: { type: integer }
+        duplicates: { type: integer }
+        received: { type: integer }
+
+    Snapshot:
+      type: object
+      properties:
+        id: { type: string }
+        workload_id: { type: string }
+        captured_at: { type: string, format: date-time }
+        status: { type: string, enum: [creating, sealed, invalid] }
+        manifest_hash: { type: string }
+        file_count: { type: integer }
+        total_bytes: { type: integer }
+        created_at: { type: string, format: date-time }
+        assessment:
+          type: object
+          properties:
+            integrity_ok: { type: boolean }
+            coverage_ok: { type: boolean }
+            exposure_status: { type: string, enum: [unknown, clear, suspect, affected] }
+            risk_score: { type: number }
+            explanation: { type: array, items: { type: string } }
+
+    AnalyzeRequest:
+      type: object
+      properties:
+        window_seconds: { type: integer, default: 300, minimum: 60 }
+        baseline_window_count: { type: integer, default: 24, minimum: 1 }
+        detector_version: { type: string, default: rules-v1 }
+
+    SelectorReport:
+      type: object
+      required: [status, requires_operator_approval, candidates]
+      properties:
+        status: { type: string, enum: [candidate_available, no_safe_candidate] }
+        incident_onset: { type: string, format: date-time, nullable: true }
+        recommended_snapshot_id: { type: string, nullable: true }
+        requires_operator_approval: { type: boolean }
+        detector_version: { type: string }
+        evaluated_at: { type: string, format: date-time }
+        reasons: { type: array, items: { type: string } }
+        candidates:
+          type: array
+          items:
+            type: object
+            properties:
+              snapshot_id: { type: string }
+              captured_at: { type: string, format: date-time }
+              integrity_ok: { type: boolean }
+              exposure_status: { type: string }
+              eligible: { type: boolean }
+              data_loss_minutes: { type: number }
+              file_count: { type: integer }
+              reasons: { type: array, items: { type: string } }

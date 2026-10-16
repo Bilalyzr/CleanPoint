@@ -1,0 +1,8 @@
+{"api": "http://127.0.0.1:8099", "endpoint": "GET /api/v1/workloads/wl-8bd009e22625/recovery-candidates", "duration_seconds_per_level": 5, "levels":
+{
+  "concurrency_1": {"requests": 34, "rps": 6.8},
+  "concurrency_5": {"requests": 137, "rps": 27.4},
+  "concurrency_10": {"requests": 169, "rps": 33.8},
+  "concurrency_20": {"requests": 183, "rps": 36.6}
+}
+}

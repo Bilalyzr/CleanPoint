@@ -1,0 +1,41 @@
+{
+  "api": "http://127.0.0.1:8099",
+  "workload": "wl-90a5516ca662",
+  "hardware": "Luna / AMD64 / Windows-10-10.0.26200-SP0",
+  "python": "3.11.11",
+  "timestamp": "2026-10-16T02:48:37Z",
+  "results": [
+    {
+      "name": "recovery_candidates",
+      "samples": 20,
+      "p50_ms": 15.29,
+      "p95_ms": 28.01,
+      "mean_ms": 11.18,
+      "max_ms": 28.36
+    },
+    {
+      "name": "findings",
+      "samples": 20,
+      "p50_ms": 11.61,
+      "p95_ms": 32.44,
+      "mean_ms": 14.86,
+      "max_ms": 36.66
+    },
+    {
+      "name": "snapshot_capture",
+      "samples": 5,
+      "p50_ms": 690.49,
+      "p95_ms": 805.69,
+      "mean_ms": 714.83,
+      "max_ms": 805.69
+    },
+    {
+      "name": "restore_verified",
+      "samples": 5,
+      "p50_ms": 10451.0,
+      "p95_ms": 12677.3,
+      "mean_ms": 10123.74,
+      "max_ms": 12677.3
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+scenario,seed,benign,selector_status,recommended_contaminated,abstention_correct,selection_is_newest_clean,onset,attack_start
+normal_office,7,True,candidate_available,False,,True,,
+normal_office,8,True,candidate_available,False,,True,,
+benign_archive,7,True,candidate_available,False,,True,,
+benign_archive,8,True,candidate_available,False,,False,2026-01-05T11:20:00.000Z,
+benign_bulk_update,7,True,candidate_available,False,,True,,
+benign_bulk_update,8,True,candidate_available,False,,True,,
+rapid_destructive,7,False,candidate_available,False,,True,2026-01-05T11:15:00.000Z,2026-01-05T11:19:17.000Z
+rapid_destructive,8,False,candidate_available,False,,True,2026-01-05T11:15:00.000Z,2026-01-05T11:19:52.000Z
+slow_distributed,7,False,candidate_available,False,,True,2026-01-05T11:10:00.000Z,2026-01-05T11:12:33.000Z
+slow_distributed,8,False,candidate_available,False,,True,2026-01-05T11:10:00.000Z,2026-01-05T11:13:59.000Z
+extension_churn,7,False,candidate_available,False,,True,2026-01-05T11:15:00.000Z,2026-01-05T11:17:22.000Z
+extension_churn,8,False,candidate_available,False,,True,2026-01-05T11:15:00.000Z,2026-01-05T11:15:59.000Z
+mixed_activity,7,False,candidate_available,False,,True,2026-01-05T11:30:00.000Z,2026-01-05T11:34:41.000Z
+mixed_activity,8,False,candidate_available,False,,True,2026-01-05T11:30:00.000Z,2026-01-05T11:31:32.000Z
+pre_existing_contamination,7,False,no_safe_candidate,,True,,,2026-01-05T09:06:41.000Z
+pre_existing_contamination,8,False,no_safe_candidate,,True,,,2026-01-05T09:06:18.000Z

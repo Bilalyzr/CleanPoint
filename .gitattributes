@@ -1,0 +1,14 @@
+# Normalize text files; force LF where it matters.
+* text=auto
+*.sh text eol=lf
+*.go text
+*.py text
+*.sql text
+*.yaml text
+*.yml text
+*.json text
+*.md text
+*.mod text
+*.sum text
+Dockerfile text
+Makefile text

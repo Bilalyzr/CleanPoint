@@ -1,0 +1,6 @@
+# CleanPoint deliberately uses ONLY the Python 3 standard library for the
+# simulator and evaluation harness (source requirement: "Python 3, standard
+# library first"). There are no third-party Python dependencies to pin.
+#
+# The Go module dependencies are pinned exactly in go.mod / go.sum:
+#   modernc.org/sqlite v1.40.0  (pure-Go SQLite driver, no CGO)
