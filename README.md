@@ -27,11 +27,12 @@ falls back to the newest backup.
 make build && make demo      # or: scripts/bootstrap.sh && scripts/demo.sh
 ```
 
-### Web console
+### Landing page + web console
 
-The server also serves an embedded operator console — after `demo.sh` (or
-`make serve`), open **`http://127.0.0.1:8099/`** and paste the operator or
-read-only token from `sandbox/.tokens`. The console covers: overview
+`http://127.0.0.1:8099/` serves a public landing page (what the project is,
+how it works, measured results, live API status). The operator console lives
+at **`http://127.0.0.1:8099/app/`** — after `demo.sh` (or `make serve`),
+open it and paste the operator or read-only token from `sandbox/.tokens`. The console covers: overview
 dashboard, workload detail (events / snapshot timeline / detection risk
 chart / recovery candidates), the operator restore-approval flow with
 per-file verification report, audit log and settings/limitations — with the
