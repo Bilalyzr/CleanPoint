@@ -445,7 +445,21 @@ func (s *Server) handleGetRun(w http.ResponseWriter, r *http.Request) {
 		mapError(w, r, err)
 		return
 	}
-	writeJSON(w, http.StatusOK, run)
+	// Include the stored per-file report (proposed in PRD §6.3: per-file
+	// verification GET) so the console can render outcomes after navigation.
+	type runWithReport struct {
+		domain.RecoveryRun
+		Report map[string]any `json:"report,omitempty"`
+	}
+	out := runWithReport{RecoveryRun: run}
+	var raw string
+	if err := s.store.DB().QueryRow(`SELECT report_json FROM recovery_runs WHERE id=?`, run.ID).Scan(&raw); err == nil && raw != "" {
+		rep := map[string]any{}
+		if json.Unmarshal([]byte(raw), &rep) == nil {
+			out.Report = rep
+		}
+	}
+	writeJSON(w, http.StatusOK, out)
 }
 
 func (s *Server) handleListRuns(w http.ResponseWriter, r *http.Request) {

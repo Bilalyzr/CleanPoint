@@ -27,6 +27,18 @@ falls back to the newest backup.
 make build && make demo      # or: scripts/bootstrap.sh && scripts/demo.sh
 ```
 
+### Web console
+
+The server also serves an embedded operator console — after `demo.sh` (or
+`make serve`), open **`http://127.0.0.1:8099/`** and paste the operator or
+read-only token from `sandbox/.tokens`. The console covers: overview
+dashboard, workload detail (events / snapshot timeline / detection risk
+chart / recovery candidates), the operator restore-approval flow with
+per-file verification report, audit log and settings/limitations — with the
+LOCAL SIMULATION badge and labelled status chips everywhere (never color
+alone). It is the PRD's M1 "static assets served from Go" console (no build
+toolchain); the React/TypeScript M2 console remains optional future work.
+
 This starts the local API, then runs the guided three-scene demonstration:
 
 1. **Normal office activity** — periodic snapshots, no anomalies, newest
@@ -202,6 +214,9 @@ every object hash before and after copying — the safety margin is the cost.
 
 Phase **M0** (14-day MVP) complete: local Go + SQLite core, Python
 simulation/evaluation, ≥92-case test matrix, benchmarks, one-command demo.
-The proposed React console (M2) is intentionally deferred until M0 acceptance
-passes — the M0 interface is the REST API and CLI, per the source
-specification.
+**M1 shipped**: the embedded operator web console (static assets served from
+Go, same-origin, token-gated) — M0 acceptance had already passed (0 unsafe
+selections on the locked corpus). The richer React/TypeScript M2 console
+(investigation timeline, scenario control) remains optional future work.
+`web/` holds the console sources (`index.html`, `app.js`, `styles.css`,
+embedded via `go:embed`).

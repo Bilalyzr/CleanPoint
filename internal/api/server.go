@@ -73,6 +73,10 @@ func (s *Server) routes() {
 	m.Handle("GET /api/v1/audit-events", auth(RequireOperator(http.HandlerFunc(s.handleAudit))))
 	m.Handle("GET /api/v1/config", auth(http.HandlerFunc(s.handleConfig)))
 
+	// Embedded operator console (M1 static assets, same-origin).
+	m.HandleFunc("GET /{$}", s.webIndex())
+	m.Handle("GET /app/", s.webUI())
+
 	// Fallback: unknown paths return structured 404 rather than plain text.
 	m.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		writeError(w, r, http.StatusNotFound, "not_found", "unknown route")
