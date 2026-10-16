@@ -73,6 +73,14 @@ func (s *Server) routes() {
 	m.Handle("GET /api/v1/audit-events", auth(RequireOperator(http.HandlerFunc(s.handleAudit))))
 	m.Handle("GET /api/v1/config", auth(http.HandlerFunc(s.handleConfig)))
 
+	// M2 support endpoints
+	m.Handle("GET /api/v1/snapshots/{id}", auth(http.HandlerFunc(s.handleSnapshotDetail)))
+	m.Handle("GET /api/v1/workloads/{id}/analysis-runs", auth(http.HandlerFunc(s.handleAnalysisRuns)))
+	m.Handle("GET /api/v1/evaluations", auth(http.HandlerFunc(s.handleEvaluations)))
+	m.Handle("POST /api/v1/simulate", auth(RequireOperator(http.HandlerFunc(s.handleSimulateCreate))))
+	m.Handle("GET /api/v1/simulations", auth(RequireOperator(http.HandlerFunc(s.handleSimulationList))))
+	m.Handle("GET /api/v1/simulations/{id}", auth(RequireOperator(http.HandlerFunc(s.handleSimulationGet))))
+
 	// Public landing page at "/", operator console under /app/ (M1 static
 	// assets, same-origin).
 	m.HandleFunc("GET /{$}", s.landingPage())

@@ -185,6 +185,48 @@ paths:
       parameters: [{ $ref: "#/components/parameters/Id" }]
       responses:
         "200": { description: Run list }
+  /snapshots/{id}:
+    get:
+      summary: Snapshot detail with assessment and manifest rows (read)
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200": { description: Snapshot + files (limit 200, ?limit up to 2000) }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /workloads/{id}/analysis-runs:
+    get:
+      summary: Analysis history for a workload (read)
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200": { description: Analysis run rows }
+  /evaluations:
+    get:
+      summary: Measured evaluation report from results/ (read; never invented)
+      responses:
+        "200": { description: Report payload or {available: false} }
+  /simulate:
+    post:
+      summary: Start a deterministic scenario job (operator; single concurrency)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [scenario, seed]
+              properties:
+                scenario: { type: string, enum: [normal_office, benign_archive, benign_bulk_update, rapid_destructive, slow_distributed, extension_churn, mixed_activity, pre_existing_contamination] }
+                seed: { type: integer, minimum: 1, maximum: 999 }
+      responses:
+        "202": { description: Job accepted }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "409": { $ref: "#/components/responses/Conflict" }
+  /simulations/{id}:
+    get:
+      summary: Simulation job status/log/result (operator)
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200": { description: Job }
+        "404": { $ref: "#/components/responses/NotFound" }
   /audit-events:
     get:
       summary: Audit trail (operator only)

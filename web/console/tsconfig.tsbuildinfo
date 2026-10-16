@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/api.ts","./src/charts.tsx","./src/components.tsx","./src/main.tsx","./src/pages/audit.tsx","./src/pages/evaluations.tsx","./src/pages/login.tsx","./src/pages/overview.tsx","./src/pages/settings.tsx","./src/pages/simulation.tsx","./src/pages/workloaddetail.tsx","./src/pages/workloads.tsx"],"version":"5.9.3"}

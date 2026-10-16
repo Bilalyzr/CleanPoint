@@ -11,3 +11,4 @@ __pycache__/
 Thumbs.db
 .DS_Store
 sandbox-server.log
+node_modules/

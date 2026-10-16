@@ -27,12 +27,28 @@ falls back to the newest backup.
 make build && make demo      # or: scripts/bootstrap.sh && scripts/demo.sh
 ```
 
-### Landing page + web console
+### Landing page + web console (M2)
 
-`http://127.0.0.1:8099/` serves a public landing page (what the project is,
-how it works, measured results, live API status). The operator console lives
-at **`http://127.0.0.1:8099/app/`** — after `demo.sh` (or `make serve`),
-open it and paste the operator or read-only token from `sandbox/.tokens`. The console covers: overview
+`http://127.0.0.1:8099/` serves a cinematic public landing page (scroll
+story + 3D snapshot corridor). The operator console lives at
+**`http://127.0.0.1:8099/app/`** — a dedicated React + TypeScript + Vite
+application (PRD Phase M2) covering all fifteen specified pages: login with
+role detection, overview dashboard, workloads, workload detail (events /
+snapshot timeline + manifest detail / findings risk chart / recovery
+candidates with no-safe-candidate handling / operator restore approval +
+per-file run report), **Simulation Lab** (run any of the 8 scenario
+families by seed from the UI), **Evaluations** (measured metrics + the
+newest/integrity-only/CleanPoint selector comparison), audit log and
+settings. Sign in with the operator or read-only token from
+`sandbox/.tokens`.
+
+The console's source lives in `web/console/`; the production bundle is
+prebuilt into `web/console-dist/` and embedded via `go:embed`, so a fresh
+clone serves it with no Node toolchain. To rebuild after editing:
+
+```bash
+cd web/console && npm install && npm run build   # -> ../console-dist
+``` The console covers: overview
 dashboard, workload detail (events / snapshot timeline / detection risk
 chart / recovery candidates), the operator restore-approval flow with
 per-file verification report, audit log and settings/limitations — with the
@@ -215,9 +231,11 @@ every object hash before and after copying — the safety margin is the cost.
 
 Phase **M0** (14-day MVP) complete: local Go + SQLite core, Python
 simulation/evaluation, ≥92-case test matrix, benchmarks, one-command demo.
-**M1 shipped**: the embedded operator web console (static assets served from
-Go, same-origin, token-gated) — M0 acceptance had already passed (0 unsafe
-selections on the locked corpus). The richer React/TypeScript M2 console
-(investigation timeline, scenario control) remains optional future work.
-`web/` holds the console sources (`index.html`, `app.js`, `styles.css`,
-embedded via `go:embed`).
+**M1 shipped** (static console), then superseded by **M2 shipped**: the
+dedicated React/TypeScript/Vite console (all 15 PRD pages, Simulation Lab
+scenario control, Evaluations view; `web/console/` sources, prebuilt
+`web/console-dist/` bundle embedded via `go:embed`). New M2 backend
+endpoints: `GET /snapshots/{id}` (manifest detail), `GET
+/workloads/{id}/analysis-runs` (history), `GET /evaluations` (serves the
+measured report), `POST /simulate` + `GET /simulations/{id}` (operator-only
+scenario jobs driving the deterministic Python simulator).

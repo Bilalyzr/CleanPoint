@@ -1,9 +1,12 @@
-// Package web embeds the public landing page and the operator console
-// static assets (PRD M1: static assets served from Go; no backend
-// architecture change).
+// Package web embeds the public landing page and the built operator
+// console (React/TypeScript M2 bundle in console-dist/, prebuilt so a
+// fresh clone serves it without Node).
 package web
 
 import "embed"
 
-//go:embed index.html landing.html landing.css landing.js styles.css app.js
+//go:embed landing.html landing.css landing.js
 var FS embed.FS
+
+//go:embed all:console-dist
+var Dist embed.FS
