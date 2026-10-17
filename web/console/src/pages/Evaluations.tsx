@@ -1,6 +1,25 @@
 import React from "react";
 import { api } from "../api";
-import { Stat, Banner, ErrorBanner, SkeletonPage } from "../components";
+import { Banner, ErrorBanner, SkeletonPage } from "../components";
+
+function RaceRow({ name, desc, unsafe, total, hero }: { name: string; desc: string; unsafe: number; total: number; hero?: boolean }) {
+  const pct = Math.max(2, Math.round((unsafe / Math.max(1, total)) * 100));
+  return (
+    <div className={"race-row" + (hero ? " hero" : unsafe > 0 ? " bad" : "")}>
+      <div className="rr-label">
+        <b>{name}</b>
+        <span>{desc}</span>
+      </div>
+      <div className="rr-track" role="img" aria-label={`${name}: ${unsafe} of ${total} contaminated`}>
+        <span style={{ width: `${pct}%` }} />
+      </div>
+      <div className="rr-num">
+        <b>{unsafe}</b>
+        <i>/{total}</i>
+      </div>
+    </div>
+  );
+}
 
 interface EvalReport {
   available?: boolean;
@@ -55,42 +74,52 @@ export default function Evaluations() {
         Locked corpus (8 families × 2 held-out seeds). Selector comparisons are reported separately
         and never merged into a single accuracy figure. Reports live in <code>results/</code>.
       </Banner>
-      <div className="cards">
-        <Stat n={String(m.unsafe_selections ?? "—")} label="unsafe selections (target 0)" warn={Number(m.unsafe_selections) > 0} />
-        <Stat n={`${m.selection_success_num ?? 0}/${m.selection_success_den ?? 0}`} label="newest-eligible-clean chosen" />
-        <Stat n={`${m.attack_detected ?? 0}/${m.attack_scenarios ?? 0}`} label="attacks detected" />
-        <Stat n={`${m.benign_flagged_windows ?? 0}/${m.benign_windows ?? 0}`} label="benign windows flagged" />
-        <Stat n={`${m.restores_verified ?? 0}/${m.restores_performed ?? 0}`} label="verified restores" />
+      <div className="hero-band">
+        <div className="hb-item">
+          <b>{String(m.unsafe_selections ?? "—")}</b>
+          <span>unsafe selections · release target 0</span>
+        </div>
+        <div className="hb-item">
+          <b>{m.selection_success_num ?? 0}<i>/{m.selection_success_den ?? 0}</i></b>
+          <span>newest-eligible-clean chosen</span>
+        </div>
+        <div className="hb-item">
+          <b>{m.attack_detected ?? 0}<i>/{m.attack_scenarios ?? 0}</i></b>
+          <span>attacks detected</span>
+        </div>
+        <div className="hb-item">
+          <b>{m.restores_verified ?? 0}<i>/{m.restores_performed ?? 0}</i></b>
+          <span>verified restores · sources unchanged</span>
+        </div>
       </div>
 
       <div className="card">
-        <h3 className="sec" style={{ marginTop: 0 }}>Selector comparison (same evidence)</h3>
-        <table className="tbl">
-          <thead>
-            <tr>
-              <th>Selector</th>
-              <th className="num">Contaminated choices</th>
-              <th>of scenarios</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><b>newest</b> sealed snapshot (ignores evidence)</td>
-              <td className="num red"><b>{m.baseline_selector_unsafe?.newest ?? "—"}</b></td>
-              <td className="num">{m.baseline_selector_den}</td>
-            </tr>
-            <tr>
-              <td><b>integrity-only</b> newest valid-hash snapshot</td>
-              <td className="num red"><b>{m.baseline_selector_unsafe?.integrity_only ?? "—"}</b></td>
-              <td className="num">{m.baseline_selector_den}</td>
-            </tr>
-            <tr className="row-good">
-              <td><b>CleanPoint</b> (may abstain)</td>
-              <td className="num green"><b>{m.unsafe_selections ?? "—"}</b></td>
-              <td className="num">{m.scenarios_with_selection} selections</td>
-            </tr>
-          </tbody>
-        </table>
+        <h3 className="sec" style={{ marginTop: 0 }}>The selector race — same evidence, three policies</h3>
+        <p className="hint" style={{ marginBottom: 16 }}>
+          Contaminated choices per policy across {m.baseline_selector_den ?? m.scenarios} scored scenarios.
+          Shorter is safer.
+        </p>
+        <div className="race">
+          <RaceRow
+            name="newest snapshot"
+            desc="ignores all evidence — the default policy everywhere else"
+            unsafe={Number(m.baseline_selector_unsafe?.newest ?? 0)}
+            total={Number(m.baseline_selector_den || m.scenarios || 1)}
+          />
+          <RaceRow
+            name="integrity-only"
+            desc="newest snapshot whose hashes verify — still blind to contamination"
+            unsafe={Number(m.baseline_selector_unsafe?.integrity_only ?? 0)}
+            total={Number(m.baseline_selector_den || m.scenarios || 1)}
+          />
+          <RaceRow
+            name="CleanPoint"
+            desc="evidence-ranked, may abstain — this system"
+            unsafe={Number(m.unsafe_selections ?? 0)}
+            total={Number(m.baseline_selector_den || m.scenarios || 1)}
+            hero
+          />
+        </div>
       </div>
 
       <div className="card">

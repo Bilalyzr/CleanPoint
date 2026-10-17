@@ -55,7 +55,7 @@ export default function Audit() {
       {filtered.length === 0 ? (
         <div className="empty">{events.length === 0 ? "No audit events yet." : "No events match your filter."}</div>
       ) : (
-        <table className="tbl">
+        <table className="tbl feed">
           <thead>
             <tr>
               <th className="num">#</th>

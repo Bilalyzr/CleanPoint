@@ -99,13 +99,30 @@ export default function WorkloadDetail() {
       <div className="crumbs">
         <a href="#/workloads">Workloads</a> / {wl.name}
       </div>
-      <h2 className="page">
-        {wl.name} <Chip kind="unknown" label={wl.id} />
+      <div className="wl-band">
+        <div className="wb-main">
+          <h2 className="page" style={{ margin: 0 }}>{wl.name}</h2>
+          <span className="mono-id">{wl.id}</span>
+          <div className="wb-chips">
+            {snaps[0]?.assessment ? <Chip kind={snaps[0].assessment.exposure_status} label={`newest: ${snaps[0].assessment.exposure_status}`} /> : <Chip kind="unknown" label="not analyzed" />}
+            {cand ? (
+              cand.status === "candidate_available"
+                ? <Chip kind="eligible" label={`candidate: ${cand.recommended_snapshot_id?.slice(0, 14)}…`} />
+                : <Chip kind="no_safe_candidate" label="abstained" />
+            ) : null}
+            {findings?.incident_onset && <Chip kind="failed" label={`onset ${findings.incident_onset.slice(11, 16)}`} />}
+          </div>
+        </div>
+        <dl className="wb-stats">
+          <div><dt>snapshots</dt><dd>{snaps.length}</dd></div>
+          <div><dt>files</dt><dd>{num(snaps[0]?.file_count)}</dd></div>
+          <div><dt>size</dt><dd>{fmtBytes(snaps[0]?.total_bytes)}</dd></div>
+          <div><dt>restores</dt><dd>{runs.filter((r) => r.status === "verified").length}</dd></div>
+        </dl>
         {isOperator && (
-          <>
+          <div className="wb-actions">
             <button
               className="btn"
-              style={{ marginLeft: "auto" }}
               disabled={!!busy}
               onClick={() => act("Snapshot capture", () => api("POST", `/workloads/${id}/snapshots`, {}))}
             >
@@ -118,9 +135,9 @@ export default function WorkloadDetail() {
             >
               {busy === "Analysis" ? "Analyzing…" : "Analyze"}
             </button>
-          </>
+          </div>
         )}
-      </h2>
+      </div>
       <Tabs tabs={tabs} active={tab} onSelect={(t) => nav(`/workload/${id}/${t}`)} />
       {toast && <Banner tone={toast.includes("failed") ? "error" : "ok"}>{toast}</Banner>}
 
