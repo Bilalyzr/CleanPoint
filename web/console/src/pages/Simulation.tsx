@@ -60,6 +60,7 @@ export default function Simulation() {
   };
 
   const result = job?.result;
+  const logHas = (j: SimJob | null, re: RegExp) => j?.log.some((l) => re.test(l)) ?? false;
   return (
     <>
       <h2 className="page">Simulation Lab</h2>
@@ -111,9 +112,11 @@ export default function Simulation() {
 
       {job && (
         <div className="card">
-          <h3 className="sec" style={{ marginTop: 0 }}>
-            Job {job.id} — <Chip kind={job.status === "completed" ? "verified" : job.status === "failed" ? "failed" : "warn"} label={job.status} />
-          </h3>
+          <div className="job-head">
+            <h3 className="sec" style={{ margin: 0 }}>Simulation job</h3>
+            <span className="mono-id">{job.id}</span>
+            <Chip kind={job.status === "completed" ? "verified" : job.status === "failed" ? "failed" : "warn"} label={job.status} />
+          </div>
           <KV
             rows={[
               ["Scenario / seed", `${job.scenario} · seed ${job.seed}`],
@@ -121,7 +124,18 @@ export default function Simulation() {
               ["Finished", job.finished_at ? fmtTime(job.finished_at) : "—"],
             ]}
           />
-          {job.status === "running" && <p className="hint">Simulated clock running through 40 windows (13 snapshot points)…</p>}
+          {job.status === "running" && (
+            <>
+              <div className="stepper" aria-hidden="true">
+                <div className="step done">generate</div>
+                <div className={logHas(job, /window\s+(3[0-9]|[2-9]\d)/) ? "done" : "active"}>ingest + seal ×13</div>
+                <div className="">analyze</div>
+                <div className="">select</div>
+                <div className="">restore</div>
+              </div>
+              <p className="hint">Simulated clock running through 40 windows (13 snapshot points) — about 45–60 s total.</p>
+            </>
+          )}
           {job.status === "failed" && <Banner tone="error" title="Simulation failed">{job.error}</Banner>}
           {result && (
             <>

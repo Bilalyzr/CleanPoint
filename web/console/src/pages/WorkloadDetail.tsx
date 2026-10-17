@@ -4,7 +4,7 @@ import {
   api, Workload, Snapshot, Findings, SelectorReport, FileEvent, RestoreReport,
   Assessment, fmtTime, fmtBytes, num,
 } from "../api";
-import { Chip, Stat, Banner, Modal, Tabs, KV, Loading, ErrorBanner } from "../components";
+import { Chip, Stat, Banner, Modal, Tabs, KV, ErrorBanner, MiniStat, Skel } from "../components";
 import { RiskChart, SnapshotTimeline, ActivitySpark, GapBar, maxGap } from "../charts";
 import { Session } from "../App";
 
@@ -77,7 +77,14 @@ export default function WorkloadDetail() {
   };
 
   if (error) return <ErrorBanner error={error} />;
-  if (!wl) return <Loading />;
+  if (!wl)
+    return (
+      <div aria-busy="true">
+        <Skel kind="title" />
+        <div className="dash-grid"><Skel kind="card" n={4} /></div>
+        <Skel kind="block" />
+      </div>
+    );
   const isOperator = role === "operator";
   const tabs = [
     { id: "overview", label: "Overview" },
@@ -294,12 +301,28 @@ function EventsTab({ id }: { id: string }) {
       .then((d) => setEvents(d.events))
       .catch(() => setEvents([]));
   }, [id]);
-  if (!events) return <Loading />;
+  if (!events)
+    return (
+      <div aria-busy="true">
+        <div className="page-head"><span className="count-pill">loading events…</span></div>
+        <Skel kind="block" />
+        <Skel kind="block" />
+      </div>
+    );
   const rows = events.filter(
     (e) => (!op || e.operation === op) && (!q || e.path.toLowerCase().includes(q.toLowerCase()) || (e.dest_path ?? "").toLowerCase().includes(q.toLowerCase()))
   );
+  const opCount = (op: string) => events.filter((e) => e.operation === op).length;
   return (
     <>
+      <div className="page-head">
+        <span className="count-pill">{events.length} ingested</span>
+        <span className="count-pill green">{opCount("create")} creates</span>
+        <span className="count-pill">{opCount("modify")} modifies</span>
+        <span className="count-pill red">{opCount("delete")} deletes</span>
+        <span className="count-pill">{opCount("rename")} renames</span>
+        <span className="spacer" />
+      </div>
       <p className="hint">Ingested file actions (most recent {Math.min(events.length, 1000)}). Long paths wrap, full values retrievable via the API.</p>
       <div className="filters">
         <select value={op} onChange={(e) => setOp(e.target.value)} aria-label="Filter by operation">
@@ -441,8 +464,16 @@ function SnapshotDetailBody({ d }: { d: SnapshotDetail }) {
 /* ---------- findings tab (UI-09) ---------- */
 function FindingsTab({ findings }: { findings: Findings }) {
   const sus = findings.windows.filter((w) => w.alert_level === "suspicious");
+  const baseCount = findings.windows.filter((w) => w.is_baseline).length;
   return (
     <>
+      <div className="mini-stats">
+        <MiniStat v={baseCount} label="baseline windows (normal)" />
+        <MiniStat v={findings.windows_evaluated} label="windows evaluated" />
+        <MiniStat v={sus.length} label="suspicious windows" tone={sus.length ? "red" : "green"} />
+        <MiniStat v={findings.affected_files.length} label="affected files" tone={findings.affected_files.length ? "red" : undefined} />
+        <MiniStat v={findings.incident_onset ? findings.incident_onset.slice(11, 16) : "—"} label="onset (UTC)" tone={findings.incident_onset ? "red" : undefined} />
+      </div>
       <Banner tone="info" title={`Detector ${findings.detector_version} · threshold ${findings.risk_threshold}`}>
         risk_index is a <b>relative anomaly score (0..1), not a probability</b>. Onset is the earliest
         suspicious window start — a conservative lower bound, not a proven infection time.
@@ -550,8 +581,15 @@ function RecoveryTab({
   void wlId;
   const avail = cand.status === "candidate_available";
   const rec = cand.candidates.find((c) => c.snapshot_id === cand.recommended_snapshot_id);
+  const elig = cand.candidates.filter((c) => c.eligible).length;
   return (
     <>
+      <div className="mini-stats">
+        <MiniStat v={cand.candidates.length} label="snapshots ranked" />
+        <MiniStat v={elig} label="eligible" tone={elig ? "green" : undefined} />
+        <MiniStat v={cand.candidates.length - elig} label="ineligible" tone={cand.candidates.length - elig ? "red" : undefined} />
+        <MiniStat v={rec ? rec.data_loss_minutes.toFixed(1) + "m" : "—"} label="recovery gap (recommended)" />
+      </div>
       {avail && rec ? (
         <Banner tone="ok" title={`Recommendation: ${rec.snapshot_id}`}>
           newest defensible recovery point · requires operator approval · recovery gap{" "}

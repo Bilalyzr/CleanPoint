@@ -1,6 +1,6 @@
 import React from "react";
 import { api } from "../api";
-import { Stat, Banner, Loading, ErrorBanner } from "../components";
+import { Stat, Banner, ErrorBanner, SkeletonPage } from "../components";
 
 interface EvalReport {
   available?: boolean;
@@ -21,7 +21,7 @@ export default function Evaluations() {
   }, []);
 
   if (error) return <ErrorBanner error={error} />;
-  if (!rep) return <Loading />;
+  if (!rep) return <SkeletonPage />;
 
   if (rep.available === false) {
     return (

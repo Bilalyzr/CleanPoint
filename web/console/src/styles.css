@@ -270,3 +270,41 @@ details summary { cursor: pointer; color: var(--blue); margin: 10px 0; }
 .btn-lg { font-size: 15px; padding: 13px 26px; }
 
 @media (max-width: 640px) { .wl-meta { grid-template-columns: repeat(2, 1fr); } }
+
+/* ---------- all-sections finetune ---------- */
+.page-head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+.page-head .spacer { flex: 1; }
+.count-pill { display: inline-flex; align-items: center; gap: 6px; background: #E8F1F8; color: var(--blue);
+  border: 1px solid #C4DCEC; font: 600 12px/1 var(--mono); padding: 5px 11px; border-radius: 100px; }
+.count-pill.red { background: var(--red-bg); color: var(--red); border-color: #F2C4BD; }
+.count-pill.green { background: var(--green-bg); color: var(--green); border-color: #BEE3CC; }
+
+.mini-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 0 0 16px; }
+.mini-stat { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px;
+  animation: rise .45s ease-out both; }
+.mini-stat b { display: block; font-size: 19px; color: var(--navy); font-variant-numeric: tabular-nums; }
+.mini-stat b.red { color: var(--red); } .mini-stat b.green { color: var(--green); }
+.mini-stat span { font-size: 11px; color: var(--muted); letter-spacing: .03em; }
+
+.tbl tbody tr:hover { background: #F6FAFD; }
+.tbl tr.click:hover { border-left: none; }
+
+/* simulation stepper */
+.stepper { display: flex; gap: 0; margin: 14px 0 6px; flex-wrap: wrap; }
+.step { flex: 1 1 110px; min-width: 110px; text-align: center; position: relative; padding-top: 26px; font-size: 11px; color: var(--muted); }
+.step::before { content: ""; position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+  width: 14px; height: 14px; border-radius: 50%; background: #E1E8EF; border: 2px solid #fff; box-shadow: 0 0 0 1.5px #C6D0DB; }
+.step::after { content: ""; position: absolute; top: 14px; left: calc(50% + 9px); right: calc(-50% + 9px); height: 2px; background: #E1E8EF; }
+.step:last-child::after { display: none; }
+.step.done::before { background: var(--green); box-shadow: 0 0 0 1.5px var(--green); }
+.step.done::after { background: var(--green); }
+.step.active { color: var(--blue); font-weight: 600; }
+.step.active::before { background: var(--blue-2); box-shadow: 0 0 0 1.5px var(--blue-2), 0 0 0 6px rgba(30,127,175,.18); animation: pulse 1.6s infinite; }
+
+/* job card head row */
+.job-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.job-head .mono-id { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+
+/* audit action filter */
+.audit-bar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+.audit-bar input { max-width: 260px; }

@@ -134,3 +134,64 @@ export function KV({ rows }: { rows: [string, React.ReactNode][] }) {
     </dl>
   );
 }
+
+// Shared page header: title, badge, count pill, actions (right-aligned).
+export function PageHead({
+  title,
+  badge,
+  count,
+  children,
+}: {
+  title: string;
+  badge?: string;
+  count?: { n: number | string; label: string; tone?: "red" | "green" };
+  children?: React.ReactNode;
+}) {
+  return (
+    <div className="page-head">
+      <h2 className="page" style={{ margin: 0 }}>
+        {title} {badge && <span className="badge-env">{badge}</span>}
+      </h2>
+      {count && (
+        <span className={"count-pill" + (count.tone ? " " + count.tone : "")}>
+          {count.n} {count.label}
+        </span>
+      )}
+      <span className="spacer" />
+      {children}
+    </div>
+  );
+}
+
+// Shared skeleton block for async sections.
+export function Skel({ kind = "block", n = 1 }: { kind?: "title" | "card" | "block"; n?: number }) {
+  return (
+    <>
+      {Array.from({ length: n }).map((_, i) => (
+        <div key={i} className={`skel ${kind}`} style={{ animationDelay: `${i * 70}ms` }} />
+      ))}
+    </>
+  );
+}
+
+export function SkeletonPage() {
+  return (
+    <div aria-busy="true" aria-label="Loading">
+      <Skel kind="title" />
+      <div className="dash-grid">
+        <Skel kind="card" n={4} />
+      </div>
+      <Skel kind="block" />
+    </div>
+  );
+}
+
+// Small labeled stat used inside tab views.
+export function MiniStat({ v, label, tone }: { v: React.ReactNode; label: string; tone?: "red" | "green" }) {
+  return (
+    <div className="mini-stat">
+      <b className={tone}>{v}</b>
+      <span>{label}</span>
+    </div>
+  );
+}

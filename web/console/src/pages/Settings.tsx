@@ -1,6 +1,6 @@
 import React from "react";
 import { api, fmtBytes } from "../api";
-import { Loading, ErrorBanner, KV } from "../components";
+import { ErrorBanner, KV, Skel } from "../components";
 
 // UI-15: API URL, detector version, limits, CLI commands, exact trust
 // boundaries. Never presented as an enterprise-protected deployment.
@@ -11,7 +11,7 @@ export default function Settings() {
     api("GET", "/config").then(setCfg).catch(setError);
   }, []);
   if (error) return <ErrorBanner error={error} />;
-  if (!cfg) return <Loading />;
+  if (!cfg) return (<div aria-busy="true"><Skel kind="title" /><Skel kind="block" n={2} /></div>);
   return (
     <>
       <h2 className="page">Settings &amp; limitations</h2>
