@@ -74,15 +74,33 @@ func pythonCmd() string {
 	return "python"
 }
 
+func findRootFrom(start string) string {
+	dir, err := filepath.Abs(start)
+	if err != nil {
+		return ""
+	}
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "simulator", "generate.py")); err == nil {
+			return dir
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			return ""
+		}
+		dir = parent
+	}
+}
+
 func repoRoot() string {
-	exe, err := os.Executable()
-	if err == nil {
-		// Development layout: repo/cmd/cli/cli.exe
-		if d := filepath.Dir(filepath.Dir(exe)); strings.HasSuffix(filepath.ToSlash(d), "/cmd") {
-			return filepath.Dir(d)
+	if exe, err := os.Executable(); err == nil {
+		if r := findRootFrom(filepath.Dir(exe)); r != "" {
+			return r
 		}
 	}
 	if wd, err := os.Getwd(); err == nil {
+		if r := findRootFrom(wd); r != "" {
+			return r
+		}
 		return wd
 	}
 	return "."
@@ -100,8 +118,10 @@ func simulateCmd(args []string) {
 
 func evaluateCmd(args []string) {
 	fs := flag.NewFlagSet("evaluate", flag.ExitOnError)
-	scenario := fs.String("scenario", "", "scenario folder or 'all'")
+	scenario := fs.String("scenario", "", "scenario folder, split name, or 'all'")
+	seeds := fs.String("seeds", "", "comma-separated seed override")
 	asJSON := fs.Bool("json", false, "emit machine-readable JSON")
+	noRestore := fs.Bool("no-restore", false, "skip restore verification")
 	api := fs.String("api", envOr("CLEANPOINT_API", "http://127.0.0.1:8080"), "API base URL")
 	out := fs.String("output", "", "write JSON report to file")
 	fs.Parse(args)
@@ -109,8 +129,14 @@ func evaluateCmd(args []string) {
 	if *scenario != "" {
 		argz = append(argz, "--scenario", *scenario)
 	}
+	if *seeds != "" {
+		argz = append(argz, "--seeds", *seeds)
+	}
 	if *asJSON {
 		argz = append(argz, "--json")
+	}
+	if *noRestore {
+		argz = append(argz, "--no-restore")
 	}
 	if *out != "" {
 		argz = append(argz, "--output", *out)
@@ -421,7 +447,14 @@ func operatorToken() (string, error) {
 		return t, nil
 	}
 	sandbox := envOr("CLEANPOINT_SANDBOX_ROOT", "sandbox")
-	data, err := os.ReadFile(filepath.Join(filepath.FromSlash(sandbox), ".tokens"))
+	tokPath := filepath.Join(filepath.FromSlash(sandbox), ".tokens")
+	data, err := os.ReadFile(tokPath)
+	if err != nil && os.Getenv("CLEANPOINT_SANDBOX_ROOT") == "" {
+		alt := filepath.Join(repoRoot(), "sandbox", ".tokens")
+		if d2, err2 := os.ReadFile(alt); err2 == nil {
+			data, err = d2, nil
+		}
+	}
 	if err != nil {
 		return "", fmt.Errorf("no operator token (set CLEANPOINT_OPERATOR_TOKEN or run the server once to create %s/.tokens): %w", sandbox, err)
 	}

@@ -2,7 +2,7 @@ import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   api, Workload, Snapshot, Findings, SelectorReport, FileEvent, RestoreReport,
-  Assessment, fmtTime, fmtBytes, num,
+  Assessment, AnalysisRunRow, fmtTime, fmtBytes, num,
 } from "../api";
 import { Chip, Stat, Banner, Modal, Tabs, KV, ErrorBanner, MiniStat, Skel } from "../components";
 import { RiskChart, SnapshotTimeline, ActivitySpark, GapBar, maxGap } from "../charts";
@@ -158,7 +158,7 @@ export default function WorkloadDetail() {
       )}
       {tab === "findings" &&
         (findings ? (
-          <FindingsTab findings={findings} />
+          <FindingsTab wlId={id} findings={findings} />
         ) : (
           <Banner tone="warn" title="No analysis yet">
             {findingsErr ?? "Run Analyze (operator) first — the detector refuses to guess without evidence."}
@@ -205,32 +205,52 @@ export default function WorkloadDetail() {
         {runs.length === 0 ? (
           <div className="empty">No restores performed for this workload.</div>
         ) : (
-          <table className="tbl">
-            <thead>
-              <tr>
-                <th>Run</th>
-                <th>Snapshot</th>
-                <th>Status</th>
-                <th className="num">Verified</th>
-                <th className="num">Failed</th>
-                <th>Source</th>
-                <th>Created</th>
-              </tr>
-            </thead>
-            <tbody>
-              {runs.map((r) => (
-                <tr key={r.id}>
-                  <td className="path">{r.id}</td>
-                  <td className="path">{r.snapshot_id}</td>
-                  <td><Chip kind={r.status} /></td>
-                  <td className="num">{num(r.verified_files)}</td>
-                  <td className="num">{num(r.failed_files)}</td>
-                  <td>{r.source_unchanged ? <Chip kind="verified" label="unchanged" /> : "—"}</td>
-                  <td>{fmtTime(r.created_at)}</td>
+          <>
+            <p className="hint">Click a recovery run to inspect its per-file verification report.</p>
+            <table className="tbl">
+              <thead>
+                <tr>
+                  <th>Run</th>
+                  <th>Snapshot</th>
+                  <th>Status</th>
+                  <th className="num">Verified</th>
+                  <th className="num">Failed</th>
+                  <th>Source</th>
+                  <th>Created</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {runs.map((r) => {
+                  const openRun = async () => {
+                    try {
+                      const d = await api<{ report?: RestoreReport }>("GET", `/recovery-runs/${r.id}`);
+                      if (d.report) setReport(d.report);
+                      else setToast(`No stored per-file report for ${r.id}`);
+                    } catch (e) {
+                      setToast(`Load report failed: ${e instanceof Error ? e.message : e}`);
+                    }
+                  };
+                  return (
+                    <tr
+                      key={r.id}
+                      className="click"
+                      tabIndex={0}
+                      onClick={openRun}
+                      onKeyDown={(e) => e.key === "Enter" && openRun()}
+                    >
+                      <td className="path">{r.id}</td>
+                      <td className="path">{r.snapshot_id}</td>
+                      <td><Chip kind={r.status} /></td>
+                      <td className="num">{num(r.verified_files)}</td>
+                      <td className="num">{num(r.failed_files)}</td>
+                      <td>{r.source_unchanged ? <Chip kind="verified" label="unchanged" /> : "—"}</td>
+                      <td>{fmtTime(r.created_at)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </>
         )}
       </section>
     </>
@@ -479,7 +499,13 @@ function SnapshotDetailBody({ d }: { d: SnapshotDetail }) {
 }
 
 /* ---------- findings tab (UI-09) ---------- */
-function FindingsTab({ findings }: { findings: Findings }) {
+function FindingsTab({ wlId, findings }: { wlId: string; findings: Findings }) {
+  const [history, setHistory] = React.useState<AnalysisRunRow[]>([]);
+  React.useEffect(() => {
+    api<{ analysis_runs: AnalysisRunRow[] }>("GET", `/workloads/${wlId}/analysis-runs`)
+      .then((d) => setHistory(d.analysis_runs ?? []))
+      .catch(() => setHistory([]));
+  }, [wlId, findings.analysis_run_id]);
   const sus = findings.windows.filter((w) => w.alert_level === "suspicious");
   const baseCount = findings.windows.filter((w) => w.is_baseline).length;
   return (
@@ -578,6 +604,41 @@ function FindingsTab({ findings }: { findings: Findings }) {
             ))}
           </tbody>
         </table>
+      </details>
+      <details style={{ marginTop: 10 }}>
+        <summary>Analysis history ({history.length})</summary>
+        {history.length === 0 ? (
+          <div className="empty" style={{ marginTop: 10 }}>No analysis runs recorded.</div>
+        ) : (
+          <table className="tbl" style={{ marginTop: 10 }}>
+            <thead>
+              <tr>
+                <th>Run</th>
+                <th>Started</th>
+                <th>Detector</th>
+                <th className="num">Window / Baseline</th>
+                <th className="num">Threshold</th>
+                <th className="num">Evaluated</th>
+                <th>Onset</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {history.map((h) => (
+                <tr key={h.id}>
+                  <td className="path">{h.id}</td>
+                  <td className="path">{fmtTime(h.started_at)}</td>
+                  <td>{h.detector_version}</td>
+                  <td className="num">{h.window_seconds}s / {h.baseline_window_count}</td>
+                  <td className="num">{h.risk_threshold}</td>
+                  <td className="num">{h.windows_evaluated}</td>
+                  <td className="path">{fmtTime(h.incident_onset)}</td>
+                  <td><Chip kind={h.status === "completed" ? "verified" : "unknown"} label={h.status} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </details>
     </>
   );

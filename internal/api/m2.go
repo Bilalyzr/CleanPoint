@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
@@ -129,7 +130,7 @@ func (s *Server) handleAnalysisRuns(w http.ResponseWriter, r *http.Request) {
 func (s *Server) handleEvaluations(w http.ResponseWriter, r *http.Request) {
 	dir := os.Getenv("CLEANPOINT_RESULTS_DIR")
 	if dir == "" {
-		dir = "results"
+		dir = filepath.Join(repoRoot(), "results")
 	}
 	name := r.URL.Query().Get("name")
 	if name == "" {
@@ -190,9 +191,34 @@ func pythonExe() string {
 	return "python"
 }
 
-// repoRoot locates the repository root (development layout).
+func findRootFrom(start string) string {
+	dir, err := filepath.Abs(start)
+	if err != nil {
+		return ""
+	}
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "simulator", "generate.py")); err == nil {
+			return dir
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			return ""
+		}
+		dir = parent
+	}
+}
+
+// repoRoot locates the repository root (development or packaged layout).
 func repoRoot() string {
+	if exe, err := os.Executable(); err == nil {
+		if r := findRootFrom(filepath.Dir(exe)); r != "" {
+			return r
+		}
+	}
 	if wd, err := os.Getwd(); err == nil {
+		if r := findRootFrom(wd); r != "" {
+			return r
+		}
 		return wd
 	}
 	return "."
@@ -239,6 +265,14 @@ func (s *Server) handleSimulateCreate(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusAccepted, job)
 }
 
+func (s *Server) localAPIURL() string {
+	addr := s.cfg.Addr
+	if h, p, err := net.SplitHostPort(addr); err == nil && (h == "" || h == "0.0.0.0" || h == "::") {
+		addr = net.JoinHostPort("127.0.0.1", p)
+	}
+	return "http://" + addr
+}
+
 // runSimulation executes the deterministic Python scenario driver against
 // this same server (operator token in env only, never logged).
 func (s *Server) runSimulation(job *simJob) {
@@ -251,16 +285,19 @@ func (s *Server) runSimulation(job *simJob) {
 	}
 	resultPath := filepath.Join(filepath.FromSlash(s.cfg.SandboxRoot), "sim",
 		fmt.Sprintf("%s-seed%d-ui.json", job.Scenario, job.Seed))
+	_ = os.MkdirAll(filepath.Dir(resultPath), 0o755)
+	apiURL := s.localAPIURL()
 	cmd := exec.CommandContext(context.Background(), pythonExe(),
 		filepath.Join(repoRoot(), "simulator", "scenario_driver.py"),
 		"--scenario", job.Scenario,
 		"--seed", fmt.Sprint(job.Seed),
-		"--api", "http://"+s.cfg.Addr,
+		"--api", apiURL,
 		"--result", resultPath)
 	cmd.Dir = repoRoot()
 	cmd.Env = append(os.Environ(),
 		"CLEANPOINT_OPERATOR_TOKEN="+s.cfg.OperatorToken,
-		"CLEANPOINT_API=http://"+s.cfg.Addr)
+		"CLEANPOINT_SANDBOX_ROOT="+filepath.FromSlash(s.cfg.SandboxRoot),
+		"CLEANPOINT_API="+apiURL)
 	out, err := cmd.CombinedOutput()
 	for _, line := range strings.Split(string(out), "\n") {
 		if strings.TrimSpace(line) != "" {

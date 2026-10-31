@@ -1,5 +1,7 @@
 # build artifacts
 bin/
+bin/*.exe~
+*.tsbuildinfo
 # local runtime state (database, object store, restores, tokens)
 sandbox/
 # evaluation / benchmark outputs are kept in results/ EXCEPT scratch

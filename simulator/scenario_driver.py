@@ -49,12 +49,25 @@ def http_json(method, url, token, body=None, expect=(200, 201, 409)):
         return e.code, payload
 
 
+def resolve_sandbox():
+    env = os.environ.get("CLEANPOINT_SANDBOX_ROOT")
+    if env:
+        return os.path.abspath(env)
+    cwd_sb = os.path.abspath(os.path.join(os.getcwd(), "sandbox"))
+    root_sb = os.path.abspath(os.path.join(ROOT, "sandbox"))
+    if os.path.isfile(os.path.join(cwd_sb, ".tokens")):
+        return cwd_sb
+    if os.path.isfile(os.path.join(root_sb, ".tokens")):
+        return root_sb
+    return root_sb
+
+
 def load_token(api):
     tok = os.environ.get("CLEANPOINT_OPERATOR_TOKEN")
     if tok:
         return tok
-    sandbox = os.environ.get("CLEANPOINT_SANDBOX_ROOT", "sandbox")
-    for cand in (os.path.join(ROOT, sandbox), os.path.join(os.getcwd(), sandbox), sandbox):
+    sb = resolve_sandbox()
+    for cand in (sb, os.path.join(ROOT, "sandbox"), os.path.join(os.getcwd(), "sandbox")):
         path = os.path.join(cand, ".tokens")
         if os.path.isfile(path):
             for line in open(path):
@@ -64,9 +77,9 @@ def load_token(api):
 
 
 def run_scenario(scenario, seed, api, token, out_base=None, do_restore=True, verbose=False):
+    sandbox = resolve_sandbox()
     if out_base is None:
-        sandbox = os.environ.get("CLEANPOINT_SANDBOX_ROOT", os.path.join(os.getcwd(), "sandbox"))
-        out_base = os.path.join(os.path.abspath(sandbox), "sim", "%s-seed%d" % (scenario, seed))
+        out_base = os.path.join(sandbox, "sim", "%s-seed%d" % (scenario, seed))
     manifest_dir = os.path.join(out_base, "manifest")
     root = os.path.join(out_base, "root")
 
@@ -80,8 +93,7 @@ def run_scenario(scenario, seed, api, token, out_base=None, do_restore=True, ver
 
     # 2) register workload (root must live under the server's allowlisted
     #    sandbox/roots tree; we mirror that layout locally)
-    sandbox = os.environ.get("CLEANPOINT_SANDBOX_ROOT", os.path.join(os.getcwd(), "sandbox"))
-    roots_dir = os.path.join(os.path.abspath(sandbox), "roots")
+    roots_dir = os.path.join(sandbox, "roots")
     wl_root = os.path.join(roots_dir, "%s-seed%d" % (scenario, seed))
     # workload names allow only [a-z0-9-]; scenario families use underscores
     wl_name = ("%s-seed%d" % (scenario, seed)).replace("_", "-")[:64]

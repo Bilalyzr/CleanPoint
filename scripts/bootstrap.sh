@@ -7,7 +7,15 @@ echo "==> toolchain"
 go version
 python --version
 
-echo "==> building"
+if command -v npm >/dev/null 2>&1; then
+  echo "==> building M2 web console (web/console -> web/console-dist)"
+  (cd web/console && ([ -d node_modules ] || npm ci) && npm run build)
+else
+  echo "==> npm not found; embedding prebuilt web/console-dist"
+fi
+
+echo "==> building Go binaries"
+rm -f bin/*.exe~
 go build -o bin/cleanpoint.exe ./cmd/cli
 go build -o bin/cleanpoint-server.exe ./cmd/server
 go build -o bin/cleanpoint-simulator.exe ./cmd/simulator

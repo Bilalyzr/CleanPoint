@@ -81,8 +81,8 @@ func (s *Server) routes() {
 	m.Handle("GET /api/v1/simulations", auth(RequireOperator(http.HandlerFunc(s.handleSimulationList))))
 	m.Handle("GET /api/v1/simulations/{id}", auth(RequireOperator(http.HandlerFunc(s.handleSimulationGet))))
 
-	// Public landing page at "/", operator console under /app/ (M1 static
-	// assets, same-origin).
+	// Public landing page at "/", operator console under /app/ (M2 React
+	// SPA bundle, same-origin).
 	m.HandleFunc("GET /{$}", s.landingPage())
 	m.Handle("GET /app", http.RedirectHandler("/app/", http.StatusMovedPermanently))
 	m.Handle("GET /app/{path...}", s.webUI())

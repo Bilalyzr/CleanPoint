@@ -220,6 +220,12 @@ paths:
         "202": { description: Job accepted }
         "400": { $ref: "#/components/responses/BadRequest" }
         "409": { $ref: "#/components/responses/Conflict" }
+  /simulations:
+    get:
+      summary: List recent simulation jobs (operator)
+      responses:
+        "200": { description: Recent simulation jobs (newest first, capped at 20) }
+        "403": { $ref: "#/components/responses/Forbidden" }
   /simulations/{id}:
     get:
       summary: Simulation job status/log/result (operator)

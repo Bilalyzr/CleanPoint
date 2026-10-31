@@ -158,6 +158,20 @@ export interface RecoveryRun {
   created_at: string;
 }
 
+export interface AnalysisRunRow {
+  id: string;
+  detector_version: string;
+  baseline_period: string;
+  window_seconds: number;
+  baseline_window_count: number;
+  risk_threshold: number;
+  status: string;
+  incident_onset?: string;
+  windows_evaluated: number;
+  started_at: string;
+  finished_at?: string;
+}
+
 export interface SimJob {
   id: string;
   scenario: string;

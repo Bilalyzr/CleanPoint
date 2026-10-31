@@ -24,7 +24,8 @@ falls back to the newest backup.
 ## Quick start (one command)
 
 ```bash
-make build && make demo      # or: scripts/bootstrap.sh && scripts/demo.sh
+make build && make demo      # Bash/Linux/macOS: scripts/bootstrap.sh && scripts/demo.sh
+                             # Windows PowerShell: .\scripts\build.ps1; .\scripts\demo.ps1
 ```
 
 ### Landing page + web console (M2)
@@ -48,13 +49,10 @@ clone serves it with no Node toolchain. To rebuild after editing:
 
 ```bash
 cd web/console && npm install && npm run build   # -> ../console-dist
-``` The console covers: overview
-dashboard, workload detail (events / snapshot timeline / detection risk
-chart / recovery candidates), the operator restore-approval flow with
-per-file verification report, audit log and settings/limitations — with the
-LOCAL SIMULATION badge and labelled status chips everywhere (never color
-alone). It is the PRD's M1 "static assets served from Go" console (no build
-toolchain); the React/TypeScript M2 console remains optional future work.
+```
+
+Every console view keeps the `LOCAL SIMULATION` badge and labelled status chips
+(never color alone).
 
 This starts the local API, then runs the guided three-scene demonstration:
 
@@ -150,7 +148,7 @@ cleanpoint demo                                   # guided demonstration
 Tokens: set `CLEANPOINT_OPERATOR_TOKEN`/`CLEANPOINT_READONLY_TOKEN`, or let
 the server generate them once into `sandbox/.tokens` (never logged).
 
-## Tests — 104 automated cases (minimum required: 92)
+## Tests — 110 automated cases (minimum required: 92)
 
 | Suite | Required | Shipped |
 |---|---|---|
@@ -163,10 +161,11 @@ the server generate them once into `sandbox/.tokens` (never logged).
 | Restore correctness | 10 | 11 |
 | API authentication | 8 | 11 |
 | End-to-end scenarios | 8 | 8 |
-| **Total** | **92** | **104** |
+| M2 console & support API | — | 6 |
+| **Total** | **92** | **110** |
 
 ```bash
-scripts/test.sh        # go vet + full suite + generator determinism check
+scripts/test.sh        # Windows PowerShell: .\scripts\test.ps1
 ```
 
 ## Measured results

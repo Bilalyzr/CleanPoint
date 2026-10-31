@@ -2,15 +2,28 @@
 
 GO      ?= go
 PYTHON  ?= python
+NPM     ?= npm
 API     ?= http://127.0.0.1:8099
 ADDR    ?= 127.0.0.1:8099
 
-.PHONY: build test evaluate demo serve clean bootstrap benchmarks docker
+.PHONY: build build-web build-go test evaluate demo serve clean bootstrap benchmarks docker
 
-build: ## build all binaries into ./bin
+build-web: ## build the M2 React/TypeScript console into web/console-dist
+	cd web/console && (test -d node_modules || $(NPM) ci) && $(NPM) run build
+
+build-go: ## build all Go binaries into ./bin (embeds web/console-dist)
+	rm -f bin/*.exe~
 	$(GO) build -o bin/cleanpoint.exe ./cmd/cli
 	$(GO) build -o bin/cleanpoint-server.exe ./cmd/server
 	$(GO) build -o bin/cleanpoint-simulator.exe ./cmd/simulator
+
+build: ## build web console (if npm present) and all Go binaries into ./bin
+	@if command -v $(NPM) >/dev/null 2>&1; then \
+		$(MAKE) build-web; \
+	else \
+		echo "(npm not found; embedding prebuilt web/console-dist)"; \
+	fi
+	$(MAKE) build-go
 
 bootstrap: build ## toolchain check + build
 	$(GO) vet ./...
