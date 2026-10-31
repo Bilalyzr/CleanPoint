@@ -6,6 +6,7 @@ import {
 } from "../api";
 import { Chip, Stat, Banner, Modal, Tabs, KV, ErrorBanner, MiniStat, Skel } from "../components";
 import { RiskChart, SnapshotTimeline, ActivitySpark, GapBar, maxGap } from "../charts";
+import { SnapshotVault3D } from "../SnapshotVault3D";
 import { Session } from "../App";
 
 // Covers UI-04 (detail + actions), UI-06 (events), UI-07/08 (snapshots +
@@ -145,6 +146,7 @@ export default function WorkloadDetail() {
         <WorkloadOverview
           snaps={snaps}
           findings={findings}
+          cand={cand}
           runs={runs}
           onOpenSnap={async (sid) => setDetail(await fetchDetail(sid))}
         />
@@ -153,6 +155,8 @@ export default function WorkloadDetail() {
       {tab === "snapshots" && (
         <SnapshotsTab
           snaps={snaps}
+          onset={findings?.incident_onset ?? null}
+          cand={cand}
           onOpen={async (sid) => setDetail(await fetchDetail(sid))}
         />
       )}
@@ -265,11 +269,13 @@ async function fetchDetail(sid: string): Promise<SnapshotDetail> {
 function WorkloadOverview({
   snaps,
   findings,
+  cand,
   runs,
   onOpenSnap,
 }: {
   snaps: Snapshot[];
   findings: Findings | null;
+  cand: SelectorReport | null;
   runs: any[];
   onOpenSnap: (id: string) => void;
 }) {
@@ -284,6 +290,16 @@ function WorkloadOverview({
         <Stat n={susWin ?? "—"} label="suspicious windows" warn={(susWin ?? 0) > 0} />
         <Stat n={runs.filter((r) => r.status === "verified").length} label="verified restores" />
       </div>
+      {snaps.length > 0 && (
+        <SnapshotVault3D
+          snapshots={snaps}
+          onset={findings?.incident_onset ?? null}
+          recommendedId={cand?.recommended_snapshot_id ?? null}
+          abstained={cand?.status === "no_safe_candidate"}
+          onSelectSnapshot={onOpenSnap}
+          height={280}
+        />
+      )}
       <div className="card">
         <h3 className="sec" style={{ marginTop: 0 }}>Latest snapshot</h3>
         {latest ? (
@@ -408,10 +424,34 @@ function EventsTab({ id }: { id: string }) {
 }
 
 /* ---------- snapshots tab (UI-07 + UI-08) ---------- */
-function SnapshotsTab({ snaps, onOpen }: { snaps: Snapshot[]; onOpen: (id: string) => void }) {
+function SnapshotsTab({
+  snaps,
+  onset,
+  cand,
+  onOpen,
+}: {
+  snaps: Snapshot[];
+  onset: string | null;
+  cand: SelectorReport | null;
+  onOpen: (id: string) => void;
+}) {
   return (
     <>
-      <SnapshotTimeline snapshots={snaps} onSelect={(s) => onOpen(s.id)} />
+      {snaps.length > 0 && (
+        <SnapshotVault3D
+          snapshots={snaps}
+          onset={onset}
+          recommendedId={cand?.recommended_snapshot_id ?? null}
+          abstained={cand?.status === "no_safe_candidate"}
+          onSelectSnapshot={onOpen}
+          height={310}
+        />
+      )}
+      <SnapshotTimeline
+        snapshots={snaps}
+        recommendedId={cand?.recommended_snapshot_id ?? null}
+        onSelect={(s) => onOpen(s.id)}
+      />
       <p className="hint">
         Chronological snapshots. A <b>valid hash does not mean clean</b> — exposure comes from behavioral + content analysis.
       </p>

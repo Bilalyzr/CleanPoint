@@ -4,168 +4,371 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CleanPoint — Know which backup you can trust</title>
-<meta name="description" content="CleanPoint is a local, defensively designed ransomware-recovery analysis prototype: explainable anomaly detection, conservative recovery-point selection and verified isolated restores.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230D2842'/%3E%3Cpath d='M16 6.5l7.5 3.2v6.2c0 4.6-3.2 8-7.5 9.6-4.3-1.6-7.5-5-7.5-9.6V9.7L16 6.5z' fill='none' stroke='%2338BDF8' stroke-width='2'/%3E%3Cpath d='M12.3 16.2l2.7 2.7 4.8-5.2' fill='none' stroke='%2334D399' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<meta name="description" content="CleanPoint is a local, defensively designed ransomware-recovery analysis prototype: explainable rules-v1 anomaly detection, conservative recovery-point selection with abstention, and verified isolated restores.">
 <link rel="stylesheet" href="/landing/landing.css">
 </head>
-<body data-chapter="hero">
+<body data-chapter="hero" data-tone="origin">
 
-<!-- ============ fixed scene layer (canvas corridor) ============ -->
+<!-- ============ GPU 3D Chrono-Vault Stage (WebGL + 2D fallback) ============ -->
 <canvas id="scene" aria-hidden="true"></canvas>
 <div class="scene-vignette" aria-hidden="true"></div>
 <div class="scene-grid" aria-hidden="true"></div>
+<div class="scene-scanline" aria-hidden="true"></div>
 
-<!-- ============ custom cursor (desktop, fine pointer only) ============ -->
-<div id="cursor" aria-hidden="true"><div class="c-dot"></div><div class="c-ring"></div><span class="c-label"></span></div>
+<!-- ============ Scroll Progress Top Hairline ============ -->
+<div class="scroll-bar" aria-hidden="true"><span id="scrollFill"></span></div>
 
-<!-- ============ progress rail ============ -->
-<nav class="rail" aria-label="Chapters">
-  <a href="#hero" data-rail="hero"><i></i><span>Origin</span></a>
-  <a href="#incident" data-rail="incident"><i></i><span>Incident</span></a>
-  <a href="#evidence" data-rail="evidence"><i></i><span>Evidence</span></a>
-  <a href="#point" data-rail="point"><i></i><span>The point</span></a>
-  <a href="#restore" data-rail="restore"><i></i><span>Restore</span></a>
-  <a href="#abstain" data-rail="abstain"><i></i><span>Abstention</span></a>
-  <a href="#proof" data-rail="proof"><i></i><span>Proof</span></a>
+<!-- ============ Custom Spring Cursor (desktop fine pointer only) ============ -->
+<div id="cursor" aria-hidden="true">
+  <div class="c-glow"></div>
+  <div class="c-dot"></div>
+  <div class="c-ring"></div>
+  <span class="c-label"></span>
+</div>
+
+<!-- ============ Live Spatial Telemetry HUD ============ -->
+<aside class="hud" aria-hidden="true">
+  <div class="hud-head">
+    <span class="hud-led" id="hudLed"></span>
+    <span class="hud-title">CHRONO-VAULT // 13 SNAPSHOTS</span>
+    <span class="hud-engine" id="hudEngine">WEBGL 3D</span>
+  </div>
+  <div class="hud-grid">
+    <div><span class="hk">SIM CLOCK</span><b id="hudClock">09:00 UTC</b></div>
+    <div><span class="hk">WINDOW</span><b id="hudWin">W00 / 40</b></div>
+    <div><span class="hk">SHANNON H</span><b id="hudEntropy">4.18 b/B</b></div>
+    <div><span class="hk">VERDICT</span><b id="hudVerdict" class="tone-blue">BASELINE CALM</b></div>
+  </div>
+</aside>
+
+<!-- ============ Chapter Progress Rail ============ -->
+<nav class="rail" aria-label="Story chapters">
+  <div class="rail-track" aria-hidden="true"><span id="railProgress"></span></div>
+  <a href="#hero" data-rail="hero" data-cursor="origin"><i></i><span>00 · Origin</span></a>
+  <a href="#incident" data-rail="incident" data-cursor="incident"><i></i><span>01 · Incident</span></a>
+  <a href="#evidence" data-rail="evidence" data-cursor="signals"><i></i><span>02 · Evidence</span></a>
+  <a href="#point" data-rail="point" data-cursor="lock"><i></i><span>03 · The Point</span></a>
+  <a href="#restore" data-rail="restore" data-cursor="verify"><i></i><span>04 · Restore</span></a>
+  <a href="#abstain" data-rail="abstain" data-cursor="abstain"><i></i><span>05 · Abstain</span></a>
+  <a href="#lab" data-rail="lab" data-cursor="try"><i></i><span>06 · Simulator</span></a>
+  <a href="#proof" data-rail="proof" data-cursor="proof"><i></i><span>07 · Proof</span></a>
 </nav>
 
-<!-- ============ top nav ============ -->
+<!-- ============ Top Navigation ============ -->
 <header class="topnav">
-  <a class="wordmark" href="#hero" aria-label="CleanPoint home">
-    <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true"><rect width="32" height="32" rx="8" fill="url(#wg)"/><path d="M16 7l7 3v6c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9v-6l7-3z" fill="none" stroke="#EAF4FB" stroke-width="2" stroke-linejoin="round"/><path d="M12.5 16.2l2.6 2.6 4.6-5" fill="none" stroke="#7CE3A4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><defs><linearGradient id="wg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1E7FAF"/><stop offset="1" stop-color="#0F2C47"/></linearGradient></defs></svg>
+  <a class="wordmark" href="#hero" aria-label="CleanPoint home" data-cursor="home">
+    <svg viewBox="0 0 32 32" width="30" height="30" aria-hidden="true">
+      <rect width="32" height="32" rx="8" fill="url(#wg)"/>
+      <path d="M16 6.5l7.5 3.2v6.2c0 4.6-3.2 8-7.5 9.6-4.3-1.6-7.5-5-7.5-9.6V9.7L16 6.5z" fill="none" stroke="#EAF4FB" stroke-width="1.9" stroke-linejoin="round"/>
+      <path d="M12.3 16.2l2.7 2.7 4.8-5.2" fill="none" stroke="#7CE3A4" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+      <defs>
+        <linearGradient id="wg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#2596CE"/>
+          <stop offset="1" stop-color="#0D2842"/>
+        </linearGradient>
+      </defs>
+    </svg>
     <span>CleanPoint</span>
+    <em class="wm-tag">v2.0</em>
   </a>
   <nav class="toplinks" aria-label="Sections">
-    <a href="#incident">Incident</a>
-    <a href="#evidence">Evidence</a>
-    <a href="#proof">Results</a>
-    <a href="#under">System</a>
+    <a href="#incident" data-cursor="jump">Incident</a>
+    <a href="#evidence" data-cursor="jump">rules-v1</a>
+    <a href="#point" data-cursor="jump">5-Gate Lock</a>
+    <a href="#lab" data-cursor="try">Interactive Lab</a>
+    <a href="#proof" data-cursor="jump">Results</a>
   </nav>
-  <a class="btn btn-solid btn-nav" href="/app/" data-magnetic data-cursor="open">Open console</a>
+  <a class="btn btn-solid btn-nav" href="/app/" data-magnetic data-cursor="launch">
+    <span>Open console</span>
+    <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h8.5M8.5 4.2L12.3 8l-3.8 3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
 </header>
 
 <main id="main">
 
 <!-- ============ 00 · HERO ============ -->
-<section class="chapter hero" id="hero">
+<section class="chapter hero" id="hero" data-tone="origin">
   <div class="hero-inner">
-    <p class="eyebrow" data-reveal><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="6" cy="6" r="1.8" fill="currentColor"/></svg>
-      Local simulation · defensive prototype · v1.0</p>
-    <h1 class="display" aria-label="After an incident, know which backup you can trust.">
-      <span class="l" data-hl="After an incident,">After an incident,</span>
-      <span class="l accent" data-hl="know which backup">know which backup</span>
-      <span class="l" data-hl="you can trust.">you can trust.</span>
-    </h1>
-    <p class="sub" data-reveal>CleanPoint replays safe synthetic ransomware-like incidents against a
-    snapshot-protected filesystem, weighs the evidence, and recommends the newest
-    <em>defensible</em> recovery point — or refuses to recommend one at all.</p>
-    <div class="hero-actions" data-reveal>
-      <a class="btn btn-solid btn-lg" href="/app/" data-magnetic data-cursor="open">
-        Launch the recovery console
-        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </a>
-      <a class="btn btn-ghost btn-lg" href="#incident" data-magnetic data-cursor="scroll">Watch the incident unfold</a>
+    <div class="eyebrow-row" data-reveal>
+      <p class="eyebrow">
+        <span class="eyebrow-dot" aria-hidden="true"></span>
+        Local simulation · defensive prototype · v2.0.0
+      </p>
       <span class="pulse-status" id="apiStatus" role="status"><i></i>checking API…</span>
     </div>
-    <dl class="hero-meta" data-reveal>
-      <div><dt>detector</dt><dd>rules-v1 · median/MAD</dd></div>
-      <div><dt>storage</dt><dd>SHA-256 content-addressed</dd></div>
-      <div><dt>evaluated</dt><dd>0 unsafe selections</dd></div>
+
+    <h1 class="display" aria-label="After an incident, know which backup you can trust.">
+      <span class="mask-line"><span class="l" style="--li:0">After an incident,</span></span>
+      <span class="mask-line"><span class="l accent" style="--li:1">know which backup</span></span>
+      <span class="mask-line"><span class="l" style="--li:2">you can trust.</span></span>
+    </h1>
+
+    <p class="sub" data-reveal style="--d:.12s">
+      CleanPoint replays safe synthetic ransomware-like incidents across a
+      content-addressed snapshot vault, decomposes behavioral telemetry with
+      <em>explainable rules-v1 math</em>, and locks onto the newest
+      <em>defensible</em> recovery point — or refuses to guess at all.
+    </p>
+
+    <div class="hero-actions" data-reveal style="--d:.2s">
+      <a class="btn btn-solid btn-lg" href="/app/" data-magnetic data-cursor="launch">
+        <span>Launch the recovery console</span>
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a class="btn btn-ghost btn-lg" href="#incident" data-magnetic data-cursor="scroll">
+        <span>Fly through the incident</span>
+      </a>
+      <a class="btn btn-subtle btn-lg" href="#lab" data-magnetic data-cursor="try">
+        <span>Test the selector</span>
+      </a>
+    </div>
+
+    <dl class="hero-meta" data-reveal style="--d:.28s">
+      <div class="spot-card">
+        <dt>Detection Engine</dt>
+        <dd><b>rules-v1</b> · 24-window Median/MAD</dd>
+      </div>
+      <div class="spot-card">
+        <dt>Snapshot Vault</dt>
+        <dd><b>SHA-256</b> content-addressed objects</dd>
+      </div>
+      <div class="spot-card">
+        <dt>Locked Corpus</dt>
+        <dd><b>0 / 14</b> unsafe selections (target: 0)</dd>
+      </div>
+      <div class="spot-card">
+        <dt>Verification Suite</dt>
+        <dd><b>110 / 110</b> automated tests passing</dd>
+      </div>
     </dl>
   </div>
-  <div class="scroll-hint" aria-hidden="true"><span></span>scroll</div>
+
+  <div class="scroll-hint" aria-hidden="true">
+    <span class="hint-mouse"><i></i></span>
+    <span class="hint-txt">Scroll to enter the 3D snapshot corridor · Drag to orbit</span>
+  </div>
 </section>
 
-<!-- ============ 01 · THE INCIDENT ============ -->
+<!-- ============ 01 · THE INCIDENT (PINNED 3D CORRUPTION FLIGHT) ============ -->
 <section class="chapter incident" id="incident" data-tone="alert">
   <div class="pin">
-    <div class="stage-copy right">
-      <p class="chapter-no" data-reveal>Chapter 01 — The incident</p>
-      <h2 class="headline" data-reveal>The newest backup<br><span class="accent-red">is already compromised.</span></h2>
-      <p class="lede" data-reveal>Compromise predates detection. The latest snapshot carries encrypted-like
-      content behind <strong>perfectly valid hashes</strong> — restoring it reintroduces the incident
-      you are recovering from.</p>
-      <ul class="signal-list" data-reveal>
-        <li><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v4l3 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><div><b>Compromise hides upstream of alarms.</b><span>By the time anything looks wrong, recent snapshots are already poisoned.</span></div></li>
-        <li><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M10 2l7 3v5.2c0 4-2.9 6.9-7 8.3-4.1-1.4-7-4.3-7-8.3V5l7-3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M6.5 10h7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><div><b>A hash proves integrity, not cleanliness.</b><span>SHA-256 says the bytes are unchanged — not that they were safe when captured.</span></div></li>
-        <li><svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M3 14l4-5 3 3 3-4 4 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b>Recency bias is expensive.</b><span>Minutes of RPO saved versus contaminated data restored is a bad trade.</span></div></li>
-      </ul>
+    <div class="stage-split">
+      <div class="stage-spacer" aria-hidden="true">
+        <!-- Live 3D Slab Telemetry Card floating beside the 3D WebGL vault -->
+        <div class="vault-probe spot-card" id="incidentProbe">
+          <div class="vp-head">
+            <span class="mono-tag red">LIVE VAULT PROBE</span>
+            <span class="vp-snap mono" id="probeSnap">SNAP-W39 · 12:15 UTC</span>
+          </div>
+          <div class="vp-bars">
+            <div class="vp-row">
+              <span>SHA-256 Manifest Integrity</span>
+              <b class="tone-green">VALID ✓</b>
+            </div>
+            <div class="vp-meter"><span style="width:100%" class="m-green"></span></div>
+            <div class="vp-row">
+              <span>Shannon Entropy Sample (4×4 KiB)</span>
+              <b class="tone-red" id="probeEnt">7.95 bits/B</b>
+            </div>
+            <div class="vp-meter"><span id="probeEntBar" style="width:99%" class="m-red"></span></div>
+            <div class="vp-row">
+              <span>Novel Extension Replacement</span>
+              <b class="tone-red" id="probeExt">90% .lockd</b>
+            </div>
+          </div>
+          <p class="vp-caption">
+            Naive backup policies check the green bar and restore poisoned bytes. CleanPoint inspects both.
+          </p>
+        </div>
+      </div>
+
+      <div class="stage-copy">
+        <p class="chapter-no" data-reveal>Chapter 01 — The incident</p>
+        <h2 class="headline" data-reveal>
+          The newest backup<br><span class="accent-red">is already compromised.</span>
+        </h2>
+        <p class="lede" data-reveal>
+          Destructive encryption predates human alarms. The five freshest snapshots in the 3D corridor carry
+          high-entropy ciphertext behind <strong>100% valid SHA-256 checksums</strong> — restoring them
+          reintroduces the exact incident you are recovering from.
+        </p>
+        <ul class="signal-list" data-reveal>
+          <li class="spot-card">
+            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v4l3 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div>
+              <b>Compromise hides upstream of alarms.</b>
+              <span>By the time alerts fire, scheduled snapshots have already sealed encrypted files into storage.</span>
+            </div>
+          </li>
+          <li class="spot-card">
+            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M10 2l7 3v5.2c0 4-2.9 6.9-7 8.3-4.1-1.4-7-4.3-7-8.3V5l7-3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M6.5 10h7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div>
+              <b>A hash proves consistency, never cleanliness.</b>
+              <span>SHA-256 verifies that stored bytes did not bit-rot — not that those bytes were safe at capture time.</span>
+            </div>
+          </li>
+          <li class="spot-card">
+            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M3 14l4-5 3 3 3-4 4 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div>
+              <b>Recency bias is catastrophic.</b>
+              <span>In 10 of 16 locked evaluation scenarios, both “newest” and “integrity-only” policies restore poisoned data.</span>
+            </div>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ============ 02 · THE EVIDENCE ============ -->
+<!-- ============ 02 · THE EVIDENCE (INTERACTIVE SPECTROMETER) ============ -->
 <section class="chapter evidence" id="evidence" data-tone="scan">
   <div class="chapter-inner">
-    <p class="chapter-no" data-reveal>Chapter 02 — The evidence</p>
-    <h2 class="headline" data-reveal>Behavior tells the truth<br>telemetry never lies about <span class="accent-blue">change</span>.</h2>
-    <p class="lede" data-reveal>Every 300-second window is scored against a robust median/MAD baseline.
-    Six explainable signals — never a black box, never a probability.</p>
+    <p class="chapter-no" data-reveal>Chapter 02 — Explainable Telemetry</p>
+    <h2 class="headline" data-reveal>
+      Behavior tells the truth.<br>Zero black boxes — <span class="accent-blue">pure auditable math.</span>
+    </h2>
+    <p class="lede" data-reveal>
+      Every 300-second window is scored against a 24-window robust <strong>Median / MAD</strong> baseline
+      (<code>scale = max(1.4826 × MAD, ε)</code>). Hover or scrub any window below, or toggle individual
+      <code>rules-v1</code> signals to see how missing evidence lowers coverage without ever redistributing weights.
+    </p>
 
-    <div class="curve-panel" data-reveal>
+    <div class="curve-panel spot-card" data-reveal>
       <div class="curve-head">
-        <span class="mono-tag">rules-v1 · risk_index</span>
-        <span class="curve-scale mono-tag dim">relative score 0 – 1</span>
+        <div>
+          <span class="mono-tag">rules-v1 · risk_index ∈ [0, 1]</span>
+          <span class="mono-tag dim"> · coverage: <b id="activeCoverage">100% (6/6 signals)</b></span>
+        </div>
+        <div class="curve-readout mono" id="windowReadout">
+          Hover or drag across windows · Peak risk <b class="tone-red">0.890</b> @ W27 (11:15 UTC)
+        </div>
       </div>
-      <svg id="riskCurve" viewBox="0 0 960 300" role="img"
-        aria-label="Risk score per 300-second window: flat and low across the baseline, two sharp red spikes at the attack onset above the 0.35 threshold, then settling.">
+
+      <svg id="riskCurve" viewBox="0 0 960 300" role="img" data-cursor="scrub"
+        aria-label="Interactive risk score per 300-second window: flat across 24 baseline windows, crossing the 0.35 threshold at 11:15 UTC.">
         <defs>
           <linearGradient id="riskFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#1E7FAF" stop-opacity=".35"/><stop offset="1" stop-color="#1E7FAF" stop-opacity="0"/>
+            <stop offset="0" stop-color="#28A0DC" stop-opacity=".38"/>
+            <stop offset="1" stop-color="#28A0DC" stop-opacity="0"/>
           </linearGradient>
           <linearGradient id="riskStroke" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0" stop-color="#7FC5E8"/><stop offset=".62" stop-color="#7FC5E8"/><stop offset=".7" stop-color="#FF5D49"/><stop offset=".78" stop-color="#FFB84D"/><stop offset="1" stop-color="#7FC5E8"/>
+            <stop offset="0" stop-color="#7FC5E8"/>
+            <stop offset=".60" stop-color="#7FC5E8"/>
+            <stop offset=".68" stop-color="#FF5D49"/>
+            <stop offset=".80" stop-color="#FFB84D"/>
+            <stop offset="1" stop-color="#7FC5E8"/>
           </linearGradient>
         </defs>
         <g class="gridlines"></g>
-        <path class="threshold" d="M64 214 H896"/>
-        <text class="thr-label" x="896" y="206" text-anchor="end">alert threshold 0.35</text>
+        <rect class="baseline-band" x="64" y="38" width="490" height="214" rx="4"/>
+        <text class="band-label" x="76" y="56">ASSUMED-NORMAL BASELINE · 24 WINDOWS (2h 00m)</text>
+        <path class="threshold" d="M64 177 H906"/>
+        <text class="thr-label" x="904" y="170" text-anchor="end">alert threshold 0.35</text>
         <path class="area" fill="url(#riskFill)"/>
-        <path class="line" fill="none" stroke="url(#riskStroke)" stroke-width="2.5" stroke-linejoin="round"/>
+        <path class="line" fill="none" stroke="url(#riskStroke)" stroke-width="2.8" stroke-linejoin="round" stroke-linecap="round"/>
+        <line class="onset" id="onsetMarker" x1="636" y1="36" x2="636" y2="252"/>
+        <text class="onset-label" id="onsetLabel" x="644" y="54">estimated onset · 11:15 UTC</text>
+        <line class="scrub-line" id="scrubLine" x1="-50" y1="36" x2="-50" y2="252"/>
         <g class="dots"></g>
-        <line class="onset" x1="640" y1="40" x2="640" y2="252"/>
-        <text class="onset-label" x="648" y="54">estimated onset</text>
-        <text class="ax mono" x="64" y="278">09:00</text>
-        <text class="ax mono" x="610" y="278">11:15</text>
-        <text class="ax mono" x="880" y="278">12:20</text>
-        <rect class="baseline-band" x="64" y="46" width="430" height="206"/>
-        <text class="band-label" x="72" y="60">assumed-normal baseline · 24 windows</text>
+        <text class="ax mono" x="64" y="280">09:00 (W00)</text>
+        <text class="ax mono" x="308" y="280">10:00 (W12)</text>
+        <text class="ax mono" x="554" y="280">11:00 (W24 · Clean)</text>
+        <text class="ax mono" x="822" y="280">12:15 (W39)</text>
       </svg>
+
       <div class="curve-legend">
-        <span><i class="sw blue"></i>normal windows</span>
-        <span><i class="sw red"></i>attack windows</span>
-        <span><i class="sw band"></i>training period</span>
+        <span><i class="sw blue"></i>normal window</span>
+        <span><i class="sw red"></i>suspicious window (&ge; 0.35)</span>
+        <span><i class="sw band"></i>24-window Median/MAD calibration</span>
+        <span class="legend-right mono dim">Click signal weights below to toggle telemetry channels</span>
       </div>
     </div>
 
-    <ul class="signal-grid" aria-label="Detection signals">
-      <li data-reveal><b>.25</b><span>modified-file ratio</span></li>
-      <li data-reveal><b>.25</b><span>entropy shift</span></li>
-      <li data-reveal><b>.20</b><span>rename rate</span></li>
-      <li data-reveal><b>.15</b><span>extension novelty</span></li>
-      <li data-reveal><b>.10</b><span>delete rate</span></li>
-      <li data-reveal><b>.05</b><span>size change</span></li>
+    <ul class="signal-grid" id="signalToggles" aria-label="Interactive detection signal weights">
+      <li class="spot-card active" data-sig="mod" data-weight="0.25" tabindex="0" role="switch" aria-checked="true" data-cursor="toggle">
+        <div class="sg-top"><b>.25</b><span class="sg-pill">ON</span></div>
+        <span>modified_file_ratio</span>
+        <i class="sg-bar" style="--w:100%"></i>
+      </li>
+      <li class="spot-card active" data-sig="ent" data-weight="0.25" tabindex="0" role="switch" aria-checked="true" data-cursor="toggle">
+        <div class="sg-top"><b>.25</b><span class="sg-pill">ON</span></div>
+        <span>entropy_shift_ratio (&Delta;H &ge; 1.5)</span>
+        <i class="sg-bar" style="--w:100%"></i>
+      </li>
+      <li class="spot-card active" data-sig="ren" data-weight="0.20" tabindex="0" role="switch" aria-checked="true" data-cursor="toggle">
+        <div class="sg-top"><b>.20</b><span class="sg-pill">ON</span></div>
+        <span>rename_rate (/min)</span>
+        <i class="sg-bar" style="--w:80%"></i>
+      </li>
+      <li class="spot-card active" data-sig="ext" data-weight="0.15" tabindex="0" role="switch" aria-checked="true" data-cursor="toggle">
+        <div class="sg-top"><b>.15</b><span class="sg-pill">ON</span></div>
+        <span>extension_novelty</span>
+        <i class="sg-bar" style="--w:60%"></i>
+      </li>
+      <li class="spot-card active" data-sig="del" data-weight="0.10" tabindex="0" role="switch" aria-checked="true" data-cursor="toggle">
+        <div class="sg-top"><b>.10</b><span class="sg-pill">ON</span></div>
+        <span>delete_rate (/min)</span>
+        <i class="sg-bar" style="--w:40%"></i>
+      </li>
+      <li class="spot-card active" data-sig="sz" data-weight="0.05" tabindex="0" role="switch" aria-checked="true" data-cursor="toggle">
+        <div class="sg-top"><b>.05</b><span class="sg-pill">ON</span></div>
+        <span>size_change_ratio (&ge; 50%)</span>
+        <i class="sg-bar" style="--w:20%"></i>
+      </li>
     </ul>
-    <p class="fine" data-reveal>Fixed rules-v1 weights. Missing evidence lowers coverage — it is never
-    imputed, and weights are never redistributed.</p>
+    <p class="fine" data-reveal>
+      <code>risk_index</code> is a bounded anomaly score in <code>[0, 1]</code>, never a probability. Missing telemetry lowers coverage — weights are never silently redistributed.
+    </p>
   </div>
 </section>
 
-<!-- ============ 03 · THE DEFENSIBLE POINT ============ -->
+<!-- ============ 03 · THE DEFENSIBLE POINT (PINNED 5-GATE ORBITAL LOCK) ============ -->
 <section class="chapter point" id="point" data-tone="resolve">
   <div class="pin">
-    <div class="stage-copy left">
-      <p class="chapter-no" data-reveal>Chapter 03 — The defensible point</p>
-      <h2 class="headline" data-reveal>Safety before recency.<br><span class="accent-green">Always.</span></h2>
-      <p class="lede" data-reveal>The selector walks snapshots newest-first and demands four proofs before
-      it will recommend anything:</p>
-      <ol class="proof-steps" data-reveal>
-        <li><i>01</i><div><b>Sealed &amp; integrity-verified</b><span>manifest and every object re-hashed</span></div></li>
-        <li><i>02</i><div><b>Exposure clear</b><span>no suspicious window closed before capture</span></div></li>
-        <li><i>03</i><div><b>Baseline coverage</b><span>24 normal windows of history behind it</span></div></li>
-        <li><i>04</i><div><b>Strictly before onset</b><span>captured earlier than the earliest plausible attack</span></div></li>
-      </ol>
-      <p class="lede" data-reveal>Among equals, the newest wins. The recovery gap is measured in minutes
-      — and shown, never hidden.</p>
+    <div class="stage-split reverse">
+      <div class="stage-copy">
+        <p class="chapter-no" data-reveal>Chapter 03 — The 5-Gate Orbital Lock</p>
+        <h2 class="headline" data-reveal>
+          Safety before recency.<br><span class="accent-green">Every single time.</span>
+        </h2>
+        <p class="lede" data-reveal>
+          The conservative selector walks snapshots newest-first and demands <strong>five simultaneous proofs</strong>
+          before recommending a recovery candidate:
+        </p>
+        <ol class="proof-steps" id="gateSteps" data-reveal>
+          <li data-gate="0"><i>GATE 01</i><div><b>Logically sealed</b><span>Immutable terminal status with persisted canonical JSONL manifest hash</span></div></li>
+          <li data-gate="1"><i>GATE 02</i><div><b>Deep cryptographic integrity</b><span>Manifest recomputed from SQLite + every SHA-256 object re-hashed on disk</span></div></li>
+          <li data-gate="2"><i>GATE 03</i><div><b>Full 24-window baseline coverage</b><span>Uncontaminated calibration history precedes snapshot capture</span></div></li>
+          <li data-gate="3"><i>GATE 04</i><div><b>Exposure certified clear</b><span>Zero ended/overlapping suspicious windows and clean manifest entropy profile</span></div></li>
+          <li data-gate="4"><i>GATE 05</i><div><b>Strictly pre-onset capture</b><span><code>captured_at &lt; incident_onset</code> — upstream of earliest plausible compromise</span></div></li>
+        </ol>
+        <p class="lede" data-reveal>
+          Among snapshots passing all five gates, the newest wins. The exact RPO recovery gap in minutes is surfaced — never hidden.
+        </p>
+      </div>
+
+      <div class="stage-spacer" aria-hidden="true">
+        <div class="lock-card spot-card">
+          <div class="lc-ring-wrap">
+            <svg viewBox="0 0 180 180" class="lc-gimbal">
+              <circle cx="90" cy="90" r="76" class="g-track"/>
+              <circle cx="90" cy="90" r="76" class="g-prog" id="gimbalArc"/>
+              <circle cx="90" cy="90" r="56" class="g-inner"/>
+            </svg>
+            <div class="lc-center">
+              <span class="mono-tag green">RECOMMENDED</span>
+              <b>SNAP-W24</b>
+              <span class="mono dim">11:00 UTC</span>
+            </div>
+          </div>
+          <div class="lc-meta">
+            <div><span>Gates Passed</span><b class="tone-green" id="gatesPassedTxt">5 / 5 GATES</b></div>
+            <div><span>RPO Gap</span><b>75.0 min</b></div>
+            <div><span>Contaminated Files</span><b class="tone-green">0 / 120</b></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -173,16 +376,45 @@
 <!-- ============ 04 · THE RESTORE ============ -->
 <section class="chapter restore" id="restore" data-tone="verify">
   <div class="chapter-inner">
-    <p class="chapter-no" data-reveal>Chapter 04 — The restore</p>
-    <h2 class="headline" data-reveal>Copied out. Re-hashed.<br><span class="accent-green">Proven unchanged.</span></h2>
-    <p class="lede" data-reveal>Restore requires an operator's explicit approval. Output lands in a
-    server-generated isolated directory — the sealed source is verified untouched afterwards.</p>
-    <div class="hashfile" data-reveal aria-label="Per-file verification: every file hash matched">
-      <div class="hashfile-head mono-tag">restore · 117 files · sha-256</div>
+    <p class="chapter-no" data-reveal>Chapter 04 — Verified Isolated Restore</p>
+    <h2 class="headline" data-reveal>
+      Copied out. Re-hashed.<br><span class="accent-green">Source proven untouched.</span>
+    </h2>
+    <p class="lede" data-reveal>
+      Restore demands an Operator bearer token, explicit <code>confirm: true</code>, and a live
+      <code>EligibleNow()</code> re-hash check. Files materialize atomically inside an isolated
+      <code>sandbox/restored/&lt;target&gt;-&lt;runhex&gt;/</code> directory — never overwriting live roots.
+    </p>
+
+    <div class="restore-chambers" data-reveal>
+      <div class="chamber spot-card">
+        <span class="mono-tag">01 · SEALED SOURCE</span>
+        <b>objects/aa/bb/&lt;sha256&gt;</b>
+        <p>Pre-restore <code>Verify()</code> re-hashes every referenced content-addressed object.</p>
+      </div>
+      <div class="chamber-arrow" aria-hidden="true"><span></span></div>
+      <div class="chamber spot-card">
+        <span class="mono-tag">02 · ATOMIC MATERIALIZE</span>
+        <b>temp → fsync → rename</b>
+        <p>Writes into server-generated <code>sandbox/restored/</code>; re-reads and hashes every output file.</p>
+      </div>
+      <div class="chamber-arrow" aria-hidden="true"><span></span></div>
+      <div class="chamber spot-card good">
+        <span class="mono-tag green">03 · NON-MUTATION PROOF</span>
+        <b>source_unchanged = true</b>
+        <p>Post-copy <code>Verify()</code> proves the sealed snapshot was not altered during recovery.</p>
+      </div>
+    </div>
+
+    <div class="hashfile spot-card" data-reveal aria-label="Per-file cryptographic verification stream">
+      <div class="hashfile-head mono-tag">
+        <span>recovery-run · snap-w24 · sha-256 dual-proof</span>
+        <span class="dim">sandbox/restored/clean-point-8f3c1a/</span>
+      </div>
       <ul id="hashRows"></ul>
       <div class="hashfile-foot">
-        <span class="ok-count mono-tag"><b id="hashOk">0</b>/117 verified</span>
-        <span class="mono-tag dim">source_unchanged = true</span>
+        <span class="ok-count mono-tag"><b id="hashOk">0</b> / 117 files verified</span>
+        <span class="mono-tag green">source_unchanged = true ✓</span>
       </div>
     </div>
   </div>
@@ -192,63 +424,163 @@
 <section class="chapter abstain" id="abstain" data-tone="void">
   <div class="abstain-inner">
     <p class="mono-tag red" data-reveal>status: no_safe_candidate</p>
-    <h2 class="display-sm" data-reveal>Sometimes the bravest recovery<br>is <span class="accent-red">refusing to guess.</span></h2>
-    <p class="lede" data-reveal>When contamination predates every snapshot, no point can be defended.
-    CleanPoint returns an empty recommendation with evidence-based reasons —
-    and never, ever falls back to the newest backup.</p>
-    <pre class="term" data-reveal aria-label="API response example"><span class="t-dim">GET</span> /api/v1/workloads/<span class="t-arg">wl-…</span>/recovery-candidates
+    <h2 class="display-sm" data-reveal>
+      Sometimes the bravest recovery<br>is <span class="accent-red">refusing to guess.</span>
+    </h2>
+    <p class="lede" data-reveal>
+      When destructive activity occurs inside window 0 before the very first snapshot is captured
+      (<code>pre_existing_contamination</code>), <code>BaselineContaminated()</code> voids baseline certification.
+      CleanPoint returns <code>recommended_snapshot_id: null</code> with explicit evidence — and
+      <strong>never falls back to the newest backup</strong>.
+    </p>
+    <pre class="term spot-card" data-reveal aria-label="Abstention API response"><span class="t-dim">GET</span> /api/v1/workloads/<span class="t-arg">wl-9c41e0b2a7d1</span>/recovery-candidates
 {
   <span class="t-key">"status"</span>: <span class="t-str">"no_safe_candidate"</span>,
   <span class="t-key">"recommended_snapshot_id"</span>: <span class="t-num">null</span>,
-  <span class="t-key">"reasons"</span>: [<span class="t-str">"baseline window 09:05 shows a mass high-entropy rewrite…"</span>]
+  <span class="t-key">"rpo_gap_minutes"</span>: <span class="t-num">null</span>,
+  <span class="t-key">"reasons"</span>: [
+    <span class="t-str">"baseline period shows high-entropy mass modification in window 09:00Z — baseline cannot certify cleanliness"</span>,
+    <span class="t-str">"snapshot exposure status is unknown (coverage_ok = false)"</span>
+  ]
 }</pre>
   </div>
 </section>
 
-<!-- ============ 06 · PROOF ============ -->
-<section class="chapter proof" id="proof" data-tone="calm">
+<!-- ============ 06 · INTERACTIVE POLICY SIMULATOR ("TEST THE SELECTOR") ============ -->
+<section class="chapter lab" id="lab" data-tone="scan">
   <div class="chapter-inner">
-    <p class="chapter-no" data-reveal>Chapter 05 — The proof</p>
-    <h2 class="headline" data-reveal>Evidence, not claims.</h2>
-    <p class="lede" data-reveal>Measured by this repository's own harness on a locked evaluation corpus —
-    8 scenario families × 2 held-out seeds. Reports checked in under <code>results/</code>.</p>
-    <div class="proof-grid">
-      <div class="stat" data-count="0" data-reveal><b>0</b><span>unsafe selections<br>on the locked corpus</span></div>
-      <div class="stat good" data-count="100" data-suffix="%" data-reveal><b>0%</b><span>known-attack recall<br>(8 / 8 scenarios)</span></div>
-      <div class="stat" data-count="0.83" data-suffix="%" data-decimals="2" data-reveal><b>0%</b><span>benign-window alert rate<br>target ≤ 5%</span></div>
-      <div class="stat good" data-count="14" data-slash="14" data-reveal><b>0/14</b><span>restores verified ·<br>source unchanged, every run</span></div>
-      <div class="stat warn" data-count="10" data-slash="16" data-reveal><b>0/16</b><span>scenarios where "newest backup"<br>restores contaminated data</span></div>
-      <div class="stat" data-count="104" data-reveal><b>0</b><span>automated tests across 9 suites<br>spec minimum: 92</span></div>
+    <p class="chapter-no" data-reveal>Chapter 06 — Interactive Decision Arena</p>
+    <h2 class="headline" data-reveal>
+      Put three backup policies<br>against the <span class="accent-blue">same incident.</span>
+    </h2>
+    <p class="lede" data-reveal>
+      Select any deterministic scenario family below to compare how <strong>Naive Newest</strong>,
+      <strong>Integrity-Only (SHA-256)</strong>, and <strong>CleanPoint (<code>rules-v1</code> + 5-Gate Selector)</strong>
+      behave across the 13 periodic snapshots:
+    </p>
+
+    <div class="arena spot-card" data-reveal>
+      <div class="arena-tabs" role="tablist" aria-label="Interactive scenario selector">
+        <button class="arena-tab active" role="tab" aria-selected="true" data-scen="rapid_destructive" data-cursor="simulate">
+          <span class="at-dot bad"></span>Rapid Destructive
+        </button>
+        <button class="arena-tab" role="tab" aria-selected="false" data-scen="slow_distributed" data-cursor="simulate">
+          <span class="at-dot bad"></span>Slow Distributed
+        </button>
+        <button class="arena-tab" role="tab" aria-selected="false" data-scen="benign_archive" data-cursor="simulate">
+          <span class="at-dot good"></span>Benign .7z Archive
+        </button>
+        <button class="arena-tab" role="tab" aria-selected="false" data-scen="pre_existing_contamination" data-cursor="simulate">
+          <span class="at-dot warn"></span>Pre-Existing Contamination
+        </button>
+      </div>
+
+      <p class="arena-desc" id="arenaDesc"></p>
+
+      <!-- 13-snapshot spatial strip -->
+      <div class="arena-strip-wrap">
+        <div class="arena-strip-label mono dim">13 PERIODIC SNAPSHOTS ACROSS 40 × 300s WINDOWS (09:00 → 12:15 UTC)</div>
+        <div class="arena-strip" id="arenaStrip" role="list" aria-label="13 periodic snapshots"></div>
+      </div>
+
+      <!-- 3-Policy Comparison Cards -->
+      <div class="arena-policies" id="arenaPolicies"></div>
+
+      <div class="arena-foot">
+        <span class="mono dim" id="arenaTruthNote"></span>
+        <a class="btn btn-solid" id="arenaLaunchBtn" href="/app/#/simulation" data-magnetic data-cursor="launch">
+          Run this live in Simulation Lab →
+        </a>
+      </div>
     </div>
-    <p class="fine" data-reveal>Synthetic corpus. Corpus-specific evidence — not production statistics.</p>
   </div>
 </section>
 
-<!-- ============ 07 · SYSTEM + CTA ============ -->
+<!-- ============ 07 · MEASURED PROOF ============ -->
+<section class="chapter proof" id="proof" data-tone="calm">
+  <div class="chapter-inner">
+    <p class="chapter-no" data-reveal>Chapter 07 — Measured Evidence</p>
+    <h2 class="headline" data-reveal>Evidence, not marketing claims.</h2>
+    <p class="lede" data-reveal>
+      Measured by this repository's offline ground-truth harness (<code>benchmarks/evaluate.py</code>) across the
+      held-out locked corpus — 8 deterministic scenario families × 2 untouched seeds. Artifacts checked into
+      <code>results/eval-locked.json</code>.
+    </p>
+    <div class="proof-grid">
+      <div class="stat good spot-card" data-tilt data-count="0" data-slash="14" data-reveal>
+        <b>0/14</b>
+        <span>unsafe snapshot selections<br>on locked corpus (release target: 0)</span>
+      </div>
+      <div class="stat good spot-card" data-tilt data-count="100" data-suffix="%" data-reveal>
+        <b>0%</b>
+        <span>known-attack onset recall<br>(8 / 8 attack scenarios detected)</span>
+      </div>
+      <div class="stat spot-card" data-tilt data-count="0.83" data-suffix="%" data-decimals="2" data-reveal>
+        <b>0%</b>
+        <span>benign-window false alert rate<br>(2 / 240 windows · target &le; 5%)</span>
+      </div>
+      <div class="stat good spot-card" data-tilt data-count="14" data-slash="14" data-reveal>
+        <b>0/14</b>
+        <span>isolated restores verified ·<br><code>source_unchanged = true</code></span>
+      </div>
+      <div class="stat warn spot-card" data-tilt data-count="10" data-slash="16" data-reveal>
+        <b>0/16</b>
+        <span>locked scenarios where naive<br>“newest / hash-only” restores poison</span>
+      </div>
+      <div class="stat spot-card" data-tilt data-count="110" data-reveal>
+        <b>0</b>
+        <span>automated tests passing across<br>10 Go &amp; security verification suites</span>
+      </div>
+    </div>
+    <p class="fine" data-reveal>Synthetic deterministic corpus. Corpus-specific engineering evidence — never presented as live enterprise telemetry.</p>
+  </div>
+</section>
+
+<!-- ============ 08 · SYSTEM ARCHITECTURE + FINALE ============ -->
 <section class="chapter under" id="under" data-tone="calm">
   <div class="chapter-inner">
-    <p class="chapter-no" data-reveal>The system</p>
-    <h2 class="headline" data-reveal>Boring components,<br>verifiable behavior.</h2>
+    <p class="chapter-no" data-reveal>System Architecture</p>
+    <h2 class="headline" data-reveal>Auditable primitives.<br>Zero-trust boundaries.</h2>
     <ul class="chips" data-reveal>
-      <li>Go net/http · single process</li><li>SQLite · WAL · FK</li>
-      <li>SHA-256 object store</li><li>rules-v1 · median/MAD</li>
-      <li>8 deterministic families</li><li>operator / read-only roles</li>
-      <li>audit trail · metrics</li><li>OpenAPI 3</li>
+      <li>Go 1.26 net/http · single binary</li>
+      <li>Pure-Go SQLite · WAL · FK ON</li>
+      <li>SHA-256 content-addressed fan-out</li>
+      <li>rules-v1 · 24w Median/MAD</li>
+      <li>8 deterministic Python families</li>
+      <li>Constant-time Bearer RBAC</li>
+      <li>Lstat symlink &amp; traversal guards</li>
+      <li>Embedded React 18 M2 Console</li>
+      <li>OpenAPI 3.0.3 · Prometheus metrics</li>
     </ul>
-    <div class="limits-strip" data-reveal>
-      <b>Honest limits</b>
-      <p>A local simulation, not a production data-protection product. No live malware is ever executed —
-      "encrypted" content is seeded random bytes. Logical immutability is API policy, not WORM storage.
-      Full positioning in <code>docs/limitations.md</code>.</p>
+
+    <div class="limits-strip spot-card" data-reveal>
+      <b>Honest Limits</b>
+      <p>
+        CleanPoint is a <strong>local defensive simulation prototype</strong>, not a production backup appliance.
+        No live malware is ever executed — “encrypted” files are deterministic seeded pseudo-random bytes.
+        Snapshot sealing is API-level logical immutability, not hardware WORM storage. Full disclosure in
+        <code>docs/limitations.md</code>.
+      </p>
     </div>
+
     <div class="finale" data-reveal>
-      <h2 class="display-sm">Run the incident.<br>Watch it refuse to guess.</h2>
+      <p class="mono-tag">READY ON LOCALHOST</p>
+      <h2 class="display-sm">Trigger a synthetic incident.<br>Watch CleanPoint refuse to guess.</h2>
       <div class="finale-actions">
-        <a class="btn btn-solid btn-lg" href="/app/" data-magnetic data-cursor="open">Open the console
-          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        <a class="btn btn-ghost btn-lg" href="/api/v1/healthz" data-cursor="json">Ping the API</a>
+        <a class="btn btn-solid btn-lg" href="/app/" data-magnetic data-cursor="launch">
+          <span>Enter the Operator Console</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a class="btn btn-ghost btn-lg" href="/app/#/simulation" data-magnetic data-cursor="simulate">
+          <span>Open Simulation Lab</span>
+        </a>
+        <a class="btn btn-subtle btn-lg" href="/api/v1/healthz" data-cursor="json">
+          <span>Ping /api/v1/healthz</span>
+        </a>
       </div>
-      <p class="fine">or from a terminal: <code>scripts/demo.sh</code> — server, demo data &amp; console in one command</p>
+      <p class="fine" style="margin:0 auto;">
+        One-command guided demo: <code>.\scripts\demo.ps1</code> (Windows) or <code>./scripts/demo.sh</code> (Linux/macOS)
+      </p>
     </div>
   </div>
 </section>
@@ -257,9 +589,12 @@
 
 <footer class="site-foot">
   <div class="foot-inner">
-    <span class="wordmark sm"><svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#1E7FAF"/><path d="M16 7l7 3v6c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9v-6l7-3z" fill="none" stroke="#EAF4FB" stroke-width="2" stroke-linejoin="round"/></svg>CleanPoint</span>
-    <span>v1.0.0 · console <a href="/app/">/app/</a> · api <a href="/api/v1/healthz">/api/v1</a></span>
-    <span class="right">LOCAL SIMULATION — defensive portfolio prototype</span>
+    <span class="wordmark sm">
+      <svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#1E7FAF"/><path d="M16 7l7 3v6c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9v-6l7-3z" fill="none" stroke="#EAF4FB" stroke-width="2" stroke-linejoin="round"/></svg>
+      CleanPoint
+    </span>
+    <span>v2.0.0 · Console <a href="/app/">/app/</a> · Simulation Lab <a href="/app/#/simulation">/app/#/simulation</a> · Health <a href="/api/v1/healthz">/api/v1/healthz</a></span>
+    <span class="right">LOCAL SIMULATION — defensive cyber-resilience prototype</span>
   </div>
 </footer>
 

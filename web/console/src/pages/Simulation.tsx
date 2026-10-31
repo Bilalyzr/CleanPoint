@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { api, SimJob, fmtTime } from "../api";
 import { Chip, Banner, KV } from "../components";
 import { Session } from "../App";
@@ -27,9 +27,20 @@ const PHASES = [
 // run panel with phase stepper and streaming driver log.
 export default function Simulation() {
   const nav = useNavigate();
+  const [searchParams] = useSearchParams();
   const { role } = React.useContext(Session);
-  const [family, setFamily] = React.useState("rapid_destructive");
+  const [family, setFamily] = React.useState(() => {
+    const q = searchParams.get("scenario") || "";
+    return FAMILIES.some((f) => f.id === q) ? q : "rapid_destructive";
+  });
   const [seed, setSeed] = React.useState(1);
+
+  React.useEffect(() => {
+    const q = searchParams.get("scenario") || "";
+    if (FAMILIES.some((f) => f.id === q)) {
+      setFamily(q);
+    }
+  }, [searchParams]);
   const [job, setJob] = React.useState<SimJob | null>(null);
   const [history, setHistory] = React.useState<SimJob[]>([]);
   const [err, setErr] = React.useState("");
@@ -153,6 +164,19 @@ export default function Simulation() {
               </div>
             ))}
           </div>
+          {job.status === "running" && (
+            <div className="sim-live-meter" aria-hidden="true">
+              <div
+                className="sim-live-fill"
+                style={{
+                  width: `${Math.min(
+                    96,
+                    Math.max(12, (phaseDone(job, job.log ?? []) / PHASES.length) * 100 + 14)
+                  )}%`,
+                }}
+              />
+            </div>
+          )}
 
           {job.status === "failed" && (
             <Banner tone="error" title="Simulation failed">{job.error}</Banner>

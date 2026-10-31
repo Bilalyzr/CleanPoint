@@ -47,7 +47,7 @@ export function Banner({
 }) {
   return (
     <div className={`banner ${tone}`} role={tone === "error" ? "alert" : "status"}>
-      {title && <b>{title}</b>}
+      {title && <b className="banner-title">{title}</b>}
       {children}
     </div>
   );
